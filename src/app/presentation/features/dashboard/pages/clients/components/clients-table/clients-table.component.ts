@@ -84,9 +84,35 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   /** @description Cantidad total de clientes disponibles para la paginación */
   @Input() total: number = 0;
   /** @description Índice de la página actual */
-  @Input() pageIndex: number = 0;
+  @Input() 
+  set pageIndex(value: number) {
+    this._pageIndex = value;
+    if (this.paginator && this.paginator.pageIndex !== value) {
+      this.isUpdatingPaginator = true;
+      this.paginator.pageIndex = value;
+      setTimeout(() => this.isUpdatingPaginator = false);
+    }
+  }
+  get pageIndex(): number {
+    return this._pageIndex;
+  }
+  private _pageIndex: number = 0;
+  
   /** @description Cantidad de elementos por página */
-  @Input() pageSize: number = 10;
+  @Input() 
+  set pageSize(value: number) {
+    this._pageSize = value;
+    if (this.paginator && this.paginator.pageSize !== value) {
+      this.isUpdatingPaginator = true;
+      this.paginator.pageSize = value;
+      setTimeout(() => this.isUpdatingPaginator = false);
+    }
+  }
+  get pageSize(): number {
+    return this._pageSize;
+  }
+  private _pageSize: number = 10;
+  
   /** @description Rango de edades permitido para los filtros de edad */
   @Input() ageRange: { min: number; max: number } = { min: 18, max: 100 };
 
@@ -113,6 +139,9 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
   /** @description Indica si el dispositivo actual es móvil */
   isMobile = false;
+
+  /** @description Bandera para evitar emisiones del paginator durante actualizaciones programáticas */
+  private isUpdatingPaginator = false;
 
   /** @description Filtro por nombre del cliente */
   nameFilter = '';
@@ -153,7 +182,9 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
     if (this.paginator) {
       this.paginator.page.subscribe((event: PageEvent) => {
-        this.pageChange.emit(event);
+        if (!this.isUpdatingPaginator) {
+          this.pageChange.emit(event);
+        }
       });
     }
   }
@@ -169,7 +200,6 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
   /**
     * @description Detecta cambios en las entradas y actualiza el dataSource cuando cambia la lista de clientes.
-    * También sincroniza el paginador cuando cambian pageIndex o pageSize.
     * @param changes - Objeto con los cambios detectados en las propiedades de entrada
     */
   ngOnChanges(changes: SimpleChanges): void {
@@ -181,11 +211,6 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
         age: client.age,
         birthDate: client.birthDate,
       }));
-    }
-
-    if ((changes['pageIndex'] || changes['pageSize']) && this.paginator) {
-      this.paginator.pageIndex = this.pageIndex;
-      this.paginator.pageSize = this.pageSize;
     }
   }
 
