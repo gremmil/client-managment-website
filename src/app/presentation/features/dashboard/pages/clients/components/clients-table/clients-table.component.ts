@@ -88,9 +88,7 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   set pageIndex(value: number) {
     this._pageIndex = value;
     if (this.paginator && this.paginator.pageIndex !== value) {
-      this.isUpdatingPaginator = true;
       this.paginator.pageIndex = value;
-      setTimeout(() => this.isUpdatingPaginator = false);
     }
   }
   get pageIndex(): number {
@@ -103,9 +101,7 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   set pageSize(value: number) {
     this._pageSize = value;
     if (this.paginator && this.paginator.pageSize !== value) {
-      this.isUpdatingPaginator = true;
       this.paginator.pageSize = value;
-      setTimeout(() => this.isUpdatingPaginator = false);
     }
   }
   get pageSize(): number {
@@ -139,9 +135,6 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
   /** @description Indica si el dispositivo actual es móvil */
   isMobile = false;
-
-  /** @description Bandera para evitar emisiones del paginator durante actualizaciones programáticas */
-  private isUpdatingPaginator = false;
 
   /** @description Filtro por nombre del cliente */
   nameFilter = '';
@@ -177,18 +170,6 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
     if (this.sort) {
       this.sort.sortChange.subscribe((sort: Sort) => {
         this.sortChange.emit(sort);
-      });
-    }
-
-    if (this.paginator) {
-      this.paginator.page.subscribe((event: PageEvent) => {
-        console.log('Paginator event:', event);
-        if (!this.isUpdatingPaginator) {
-          console.log('Emitting pageChange event');
-          this.pageChange.emit(event);
-        } else {
-          console.log('Skipping paginator event (programmatic update)');
-        }
       });
     }
   }
@@ -305,8 +286,16 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   }
 
   /**
-   * @description Abre el modal de filtros con los valores actuales y actualiza los filtros al cerrar el modal con resultado.
-   */
+    * @description Maneja el evento de cambio de página directamente desde el template.
+    * @param event - Evento de paginación con el índice y tamaño de página
+    */
+  onPageChange(event: PageEvent): void {
+    this.pageChange.emit(event);
+  }
+
+  /**
+    * @description Abre el modal de filtros con los valores actuales y actualiza los filtros al cerrar el modal con resultado.
+    */
   openFilterModal(): void {
     const isMobile = window.innerWidth < 600;
     

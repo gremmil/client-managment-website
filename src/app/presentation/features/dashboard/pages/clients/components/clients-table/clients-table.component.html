@@ -241,6 +241,7 @@
     [pageIndex]="pageIndex"
     [pageSize]="pageSize"
     [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="onPageChange($event)"
     showFirstLastButtons
     aria-label="Seleccionar página de clientes"
   >
