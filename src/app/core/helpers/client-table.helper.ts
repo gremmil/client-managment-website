@@ -99,12 +99,7 @@ export function sortClients(
       return a.valueOf() - b.valueOf();
     }
 
-    const normalizedA = String(a).toLowerCase();
-    const normalizedB = String(b).toLowerCase();
-
-    if (normalizedA < normalizedB) return -1;
-    if (normalizedA > normalizedB) return 1;
-    return 0;
+    return String(a).localeCompare(String(b), 'es', { sensitivity: 'base' });
   };
 
   return [...clients].sort((a, b) => {
