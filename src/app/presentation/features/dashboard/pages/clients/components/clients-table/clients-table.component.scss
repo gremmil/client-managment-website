@@ -136,8 +136,21 @@ table {
 
   .mat-sort-header-arrow {
     flex-shrink: 0;
-    display: flex;
+    display: flex !important;
     align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    animation: none !important;
+    transform: none !important;
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover .mat-sort-header-arrow {
+    opacity: 0.6;
+  }
+
+  .mat-sort-header-arrow.mat-sort-header-indicator-active {
+    opacity: 1;
   }
 }
 
@@ -156,11 +169,6 @@ table {
   &.active {
     color: var(--color-primary);
     background-color: var(--color-primary-light);
-    
-    &:hover {
-      background-color: var(--color-primary-light);
-      opacity: 0.8;
-    }
   }
 
   &:hover {

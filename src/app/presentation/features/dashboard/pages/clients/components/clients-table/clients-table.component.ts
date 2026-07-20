@@ -109,6 +109,28 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   }
   private _pageSize: number = 10;
   
+  /** @description Campo por el cual se está ordenando */
+  @Input()
+  set sortBy(value: string) {
+    this._sortBy = value;
+    this.syncSortUI();
+  }
+  get sortBy(): string {
+    return this._sortBy;
+  }
+  private _sortBy: string = '';
+  
+  /** @description Indica si el ordenamiento es ascendente */
+  @Input()
+  set isAscending(value: boolean) {
+    this._isAscending = value;
+    this.syncSortUI();
+  }
+  get isAscending(): boolean {
+    return this._isAscending;
+  }
+  private _isAscending: boolean = false;
+  
   /** @description Rango de edades permitido para los filtros de edad */
   @Input() ageRange: { min: number; max: number } = { min: 18, max: 100 };
 
@@ -132,9 +154,13 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly dialog = inject(MatDialog);
   private breakpointSub!: Subscription;
+  private sortSub!: Subscription;
 
   /** @description Indica si el dispositivo actual es móvil */
   isMobile = false;
+
+  /** @description Bandera para evitar emisiones del sort durante actualizaciones programáticas */
+  private isUpdatingSort = false;
 
   /** @description Filtro por nombre del cliente */
   nameFilter = '';
@@ -168,18 +194,26 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
   private connectViewChildren(): void {
     if (this.sort) {
-      this.sort.sortChange.subscribe((sort: Sort) => {
-        this.sortChange.emit(sort);
+      if (this.sortSub) {
+        this.sortSub.unsubscribe();
+      }
+      this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
+        if (!this.isUpdatingSort) {
+          this.sortChange.emit(sort);
+        }
       });
     }
   }
 
   /**
-   * @description Libera los recursos y cancela las suscripciones al destruir el componente.
-   */
+    * @description Libera los recursos y cancela las suscripciones al destruir el componente.
+    */
   ngOnDestroy(): void {
     if (this.breakpointSub) {
       this.breakpointSub.unsubscribe();
+    }
+    if (this.sortSub) {
+      this.sortSub.unsubscribe();
     }
   }
 
@@ -283,6 +317,26 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
     if (this.ageMinFilter !== null || this.ageMaxFilter !== null) count++;
     if (this.birthDateStartFilter || this.birthDateEndFilter) count++;
     return count;
+  }
+
+  /**
+    * @description Sincroniza la UI del MatSort con el estado actual del ordenamiento.
+    */
+  private syncSortUI(): void {
+    if (this.sort && this._sortBy) {
+      const direction = this._isAscending ? 'asc' : 'desc';
+      if (this.sort.active !== this._sortBy || this.sort.direction !== direction) {
+        this.isUpdatingSort = true;
+        this.sort.sort({
+          id: this._sortBy,
+          start: direction,
+          disableClear: false,
+        });
+        setTimeout(() => {
+          this.isUpdatingSort = false;
+        });
+      }
+    }
   }
 
   /**

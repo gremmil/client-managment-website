@@ -50,6 +50,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   readonly ageRange$ = this.stateService.ageRange$;
   readonly pageIndex$ = this.stateService.pageIndex$;
   readonly pageSize$ = this.stateService.pageSize$;
+  readonly sortBy$ = this.stateService.sortBy$;
+  readonly isAscending$ = this.stateService.isAscending$;
 
   @ViewChild(ClientsTableComponent) tableComponent!: ClientsTableComponent;
 

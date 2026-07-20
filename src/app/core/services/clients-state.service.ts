@@ -167,6 +167,22 @@ export class ClientsStateService {
   }
 
   /**
+    * @description Devuelve un observable con el campo de ordenamiento actual.
+    * @returns Observable con el sortBy
+    */
+  get sortBy$(): Observable<string> {
+    return this.uiState$.asObservable().pipe(map((state) => state.sortBy as string));
+  }
+
+  /**
+    * @description Devuelve un observable con la dirección de ordenamiento actual.
+    * @returns Observable con isAscending
+    */
+  get isAscending$(): Observable<boolean> {
+    return this.uiState$.asObservable().pipe(map((state) => state.isAscending));
+  }
+
+  /**
    * @description Calcula el rango de edades (mínimo y máximo) de los clientes cargados.
    * Si no hay edades válidas, devuelve un rango por defecto de 18 a 100.
    * @returns Observable con el objeto { min, max } del rango de edades

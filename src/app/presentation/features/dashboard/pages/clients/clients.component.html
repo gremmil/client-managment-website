@@ -56,6 +56,8 @@
       [total]="data.total"
       [pageIndex]="(pageIndex$ | async) ?? 0"
       [pageSize]="(pageSize$ | async) ?? 10"
+      [sortBy]="(sortBy$ | async) ?? ''"
+      [isAscending]="(isAscending$ | async) ?? false"
       [ageRange]="(ageRange$ | async) ?? { min: 18, max: 100 }"
       (sortChange)="handleSort($event)"
       (pageChange)="handlePageChange($event)"
