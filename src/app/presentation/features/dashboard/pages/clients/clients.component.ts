@@ -156,7 +156,9 @@ export class ClientsComponent implements OnInit, OnDestroy {
    */
   handleSort(event: any): void {
     if (event.direction) {
-      this.stateService.setSorting(event.active);
+      this.stateService.setSorting(event.active, event.direction === 'asc');
+    } else {
+      this.stateService.resetSorting();
     }
   }
 

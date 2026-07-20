@@ -184,13 +184,21 @@ export class ClientsStateService {
    * Reinicia la paginación a la primera página.
    * @param column - Campo del modelo Client por el cual ordenar
    */
-  setSorting(column: keyof Client): void {
-    const isSameColumn = this.currentUiState.sortBy === column;
+  setSorting(column: keyof Client, isAscending: boolean): void {
     this.uiState$.next({
       ...this.currentUiState,
       pageIndex: 0,
       sortBy: column,
-      isAscending: isSameColumn ? !this.currentUiState.isAscending : true,
+      isAscending,
+    });
+  }
+
+  resetSorting(): void {
+    this.uiState$.next({
+      ...this.currentUiState,
+      pageIndex: 0,
+      sortBy: 'createdAt',
+      isAscending: false,
     });
   }
 
