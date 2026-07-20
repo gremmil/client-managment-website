@@ -182,8 +182,12 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
 
     if (this.paginator) {
       this.paginator.page.subscribe((event: PageEvent) => {
+        console.log('Paginator event:', event);
         if (!this.isUpdatingPaginator) {
+          console.log('Emitting pageChange event');
           this.pageChange.emit(event);
+        } else {
+          console.log('Skipping paginator event (programmatic update)');
         }
       });
     }

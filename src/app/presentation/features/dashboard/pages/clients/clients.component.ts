@@ -144,12 +144,14 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * @description Maneja el evento de cambio de página del paginador y actualiza el estado.
-   * @param event - Evento de paginación con el índice y tamaño de página
-   */
+    * @description Maneja el evento de cambio de página del paginador y actualiza el estado.
+    * @param event - Evento de paginación con el índice y tamaño de página
+    */
   handlePageChange(event: any): void {
+    console.log('handlePageChange called with:', event);
     this.stateService.setPage(event.pageIndex);
     this.stateService.setPageSize(event.pageSize);
+    console.log('State updated:', this.stateService.currentUiState);
   }
 
   /**

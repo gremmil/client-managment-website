@@ -227,17 +227,21 @@ export class ClientsStateService {
   }
 
   /**
-   * @description Actualiza la cantidad de elementos por página, limitando el valor entre 10 y 100.
-   * Reinicia la paginación a la primera página.
-   * @param size - Nueva cantidad de elementos por página
-   */
+    * @description Actualiza la cantidad de elementos por página, limitando el valor entre 10 y 100.
+    * Solo reinicia la paginación a la primera página si el tamaño realmente cambió.
+    * @param size - Nueva cantidad de elementos por página
+    */
   setPageSize(size: number): void {
     const newSize = Math.max(10, Math.min(100, size));
-    this.uiState$.next({
-      ...this.currentUiState,
-      pageIndex: 0,
-      pageSize: newSize,
-    });
+    const currentPageSize = this.currentUiState.pageSize;
+    
+    if (newSize !== currentPageSize) {
+      this.uiState$.next({
+        ...this.currentUiState,
+        pageIndex: 0,
+        pageSize: newSize,
+      });
+    }
   }
 
   /**
