@@ -108,11 +108,11 @@ export class ClientsStateService {
   }
 
   /**
-   * @description Devuelve un observable reactivo que combina los clientes crudos con el estado
-   * de la interfaz (filtros, ordenamiento y paginación), emitiendo los datos procesados
-   * junto con el total y las métricas calculadas.
-   * @returns Observable con los clientes paginados, el total filtrado y las métricas
-   */
+    * @description Devuelve un observable reactivo que combina los clientes crudos con el estado
+    * de la interfaz (filtros, ordenamiento y paginación), emitiendo los datos procesados
+    * junto con el total y las métricas calculadas.
+    * @returns Observable con los clientes paginados, el total filtrado y las métricas
+    */
   getClientsData$(): Observable<{
     clients: Client[];
     total: number;
@@ -148,6 +148,22 @@ export class ClientsStateService {
       }),
       shareReplay({ bufferSize: 1, refCount: true }),
     );
+  }
+
+  /**
+    * @description Devuelve un observable con el índice de página actual.
+    * @returns Observable con el pageIndex
+    */
+  get pageIndex$(): Observable<number> {
+    return this.uiState$.asObservable().pipe(map((state) => state.pageIndex));
+  }
+
+  /**
+    * @description Devuelve un observable con el tamaño de página actual.
+    * @returns Observable con el pageSize
+    */
+  get pageSize$(): Observable<number> {
+    return this.uiState$.asObservable().pipe(map((state) => state.pageSize));
   }
 
   /**

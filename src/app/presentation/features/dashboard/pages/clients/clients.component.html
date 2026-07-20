@@ -54,6 +54,8 @@
       class="flex-1 min-h-0"
       [clients]="data.clients"
       [total]="data.total"
+      [pageIndex]="(pageIndex$ | async) ?? 0"
+      [pageSize]="(pageSize$ | async) ?? 10"
       [ageRange]="(ageRange$ | async) ?? { min: 18, max: 100 }"
       (sortChange)="handleSort($event)"
       (pageChange)="handlePageChange($event)"

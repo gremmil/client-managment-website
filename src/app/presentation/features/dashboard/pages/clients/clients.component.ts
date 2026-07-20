@@ -48,6 +48,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   private breakpointSub!: Subscription;
   readonly viewData$ = this.stateService.getClientsData$();
   readonly ageRange$ = this.stateService.ageRange$;
+  readonly pageIndex$ = this.stateService.pageIndex$;
+  readonly pageSize$ = this.stateService.pageSize$;
 
   @ViewChild(ClientsTableComponent) tableComponent!: ClientsTableComponent;
 

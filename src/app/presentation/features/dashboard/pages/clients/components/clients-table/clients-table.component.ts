@@ -83,6 +83,10 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   @Input() clients: Client[] = [];
   /** @description Cantidad total de clientes disponibles para la paginación */
   @Input() total: number = 0;
+  /** @description Índice de la página actual */
+  @Input() pageIndex: number = 0;
+  /** @description Cantidad de elementos por página */
+  @Input() pageSize: number = 10;
   /** @description Rango de edades permitido para los filtros de edad */
   @Input() ageRange: { min: number; max: number } = { min: 18, max: 100 };
 
@@ -164,9 +168,10 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
   }
 
   /**
-   * @description Detecta cambios en las entradas y actualiza el dataSource cuando cambia la lista de clientes.
-   * @param changes - Objeto con los cambios detectados en las propiedades de entrada
-   */
+    * @description Detecta cambios en las entradas y actualiza el dataSource cuando cambia la lista de clientes.
+    * También sincroniza el paginador cuando cambian pageIndex o pageSize.
+    * @param changes - Objeto con los cambios detectados en las propiedades de entrada
+    */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['clients']) {
       this.dataSource = this.clients.map((client) => ({
@@ -176,6 +181,11 @@ export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestro
         age: client.age,
         birthDate: client.birthDate,
       }));
+    }
+
+    if ((changes['pageIndex'] || changes['pageSize']) && this.paginator) {
+      this.paginator.pageIndex = this.pageIndex;
+      this.paginator.pageSize = this.pageSize;
     }
   }
 
