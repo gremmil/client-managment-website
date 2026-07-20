@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-spinner {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+  h2[mat-dialog-title] {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+}

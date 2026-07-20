@@ -1,0 +1,247 @@
+<div class="table-container">
+  <div *ngIf="isMobile" class="mobile-filters-bar">
+    <div class="flex items-center gap-2">
+      <button
+        (click)="openFilterModal()"
+        class="filters-toggle-btn flex-1"
+        [class.active]="activeFiltersCount > 0"
+      >
+        <ng-icon name="heroFunnel" size="18px"></ng-icon>
+        <span>Filtros</span>
+        <span *ngIf="activeFiltersCount > 0" class="filter-badge">{{ activeFiltersCount }}</span>
+      </button>
+      <button
+        *ngIf="activeFiltersCount > 0"
+        (click)="onClearAllFilters()"
+        class="clear-filters-btn"
+      >
+        <ng-icon name="heroXMark" size="16px"></ng-icon>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!isMobile" class="table-scroll">
+    <table mat-table [dataSource]="dataSource" matSort class="w-full">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef class="filterable-header">
+          <div class="header-content-wrapper">
+            <span mat-sort-header class="header-sort">Nombre</span>
+            <button
+              mat-icon-button
+              class="filter-btn"
+              (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="nameFilterMenu"
+              [class.active]="nameFilter"
+            >
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </div>
+          <mat-menu #nameFilterMenu="matMenu">
+            <div class="filter-menu-content" (click)="$event.stopPropagation()">
+              <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Filtrar nombre</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="nameFilter"
+                  (ngModelChange)="applyFilters()"
+                  (click)="$event.stopPropagation()"
+                />
+              </mat-form-field>
+              <button mat-button class="clear-btn" (click)="clearNameFilter()">
+                Limpiar
+              </button>
+            </div>
+          </mat-menu>
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+      </ng-container>
+
+      <!-- Lastname Column -->
+      <ng-container matColumnDef="lastname">
+        <th mat-header-cell *matHeaderCellDef class="filterable-header">
+          <div class="header-content-wrapper">
+            <span mat-sort-header class="header-sort">Apellido</span>
+            <button
+              mat-icon-button
+              class="filter-btn"
+              (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="lastnameFilterMenu"
+              [class.active]="lastnameFilter"
+            >
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </div>
+          <mat-menu #lastnameFilterMenu="matMenu">
+            <div class="filter-menu-content" (click)="$event.stopPropagation()">
+              <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Filtrar apellido</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="lastnameFilter"
+                  (ngModelChange)="applyFilters()"
+                  (click)="$event.stopPropagation()"
+                />
+              </mat-form-field>
+              <button
+                mat-button
+                class="clear-btn"
+                (click)="clearLastnameFilter()"
+              >
+                Limpiar
+              </button>
+            </div>
+          </mat-menu>
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.lastname }}</td>
+      </ng-container>
+
+      <!-- Age Column -->
+      <ng-container matColumnDef="age">
+        <th mat-header-cell *matHeaderCellDef class="filterable-header">
+          <div class="header-content-wrapper">
+            <span mat-sort-header class="header-sort">Edad</span>
+            <button
+              mat-icon-button
+              class="filter-btn"
+              (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="ageFilterMenu"
+              [class.active]="ageMinFilter || ageMaxFilter"
+            >
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </div>
+          <mat-menu #ageFilterMenu="matMenu">
+            <div class="filter-menu-content" (click)="$event.stopPropagation()">
+              <div class="flex gap-2">
+                <mat-form-field class="w-1/2" appearance="fill">
+                  <mat-label>Mín</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [(ngModel)]="ageMinFilter"
+                    (ngModelChange)="applyFilters()"
+                    [min]="ageRange.min"
+                    [max]="ageRange.max"
+                    (click)="$event.stopPropagation()"
+                  />
+                  <mat-error *ngIf="ageMinFilter && (ageMinFilter < ageRange.min || ageMinFilter > ageRange.max)">
+                    Rango: {{ ageRange.min }}-{{ ageRange.max }}
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field class="w-1/2" appearance="fill">
+                  <mat-label>Máx</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [(ngModel)]="ageMaxFilter"
+                    (ngModelChange)="applyFilters()"
+                    [min]="ageRange.min"
+                    [max]="ageRange.max"
+                    (click)="$event.stopPropagation()"
+                  />
+                  <mat-error *ngIf="ageMaxFilter && (ageMaxFilter < ageRange.min || ageMaxFilter > ageRange.max)">
+                    Rango: {{ ageRange.min }}-{{ ageRange.max }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <button mat-button class="clear-btn" (click)="clearAgeFilter()">
+                Limpiar
+              </button>
+            </div>
+          </mat-menu>
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.age }}</td>
+      </ng-container>
+
+      <!-- Birth Date Column -->
+      <ng-container matColumnDef="birthDate">
+        <th mat-header-cell *matHeaderCellDef class="filterable-header">
+          <div class="header-content-wrapper">
+            <span mat-sort-header class="header-sort">Fecha de Nacimiento</span>
+            <button
+              mat-icon-button
+              class="filter-btn"
+              (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="birthDateFilterMenu"
+              [class.active]="birthDateStartFilter || birthDateEndFilter"
+            >
+              <mat-icon>filter_list</mat-icon>
+            </button>
+          </div>
+          <mat-menu #birthDateFilterMenu="matMenu">
+            <div class="filter-menu-content" (click)="$event.stopPropagation()">
+              <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Fecha inicio</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="startPicker"
+                  [(ngModel)]="birthDateStartFilter"
+                  (dateChange)="applyFilters()"
+                  (click)="$event.stopPropagation()"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="startPicker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+                <mat-hint>DD/MM/YYYY</mat-hint>
+              </mat-form-field>
+              <mat-form-field class="w-full" appearance="fill">
+                <mat-label>Fecha fin</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="endPicker"
+                  [(ngModel)]="birthDateEndFilter"
+                  (dateChange)="applyFilters()"
+                  (click)="$event.stopPropagation()"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="endPicker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+                <mat-hint>DD/MM/YYYY</mat-hint>
+              </mat-form-field>
+              <button mat-button class="clear-btn" (click)="clearBirthDateFilter()">Limpiar</button>
+            </div>
+          </mat-menu>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.birthDate | date: "dd/MM/yyyy" }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">
+          No se encontraron clientes con los filtros actuales.
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div *ngIf="isMobile" class="cards-container">
+    <div *ngIf="dataSource.length === 0" class="no-data-message">
+      No se encontraron clientes con los filtros actuales.
+    </div>
+    <div *ngFor="let row of dataSource" class="client-card">
+      <div class="card-header">
+        <h3 class="card-title">{{ row.name }} {{ row.lastname }}</h3>
+        <span class="age-badge">{{ row.age }} años</span>
+      </div>
+      <p class="card-subtitle">{{ row.birthDate | date: "dd/MM/yyyy" }}</p>
+    </div>
+  </div>
+
+  <mat-paginator
+    [length]="total"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    [pageSize]="10"
+    showFirstLastButtons
+    aria-label="Seleccionar página de clientes"
+  >
+  </mat-paginator>
+</div>

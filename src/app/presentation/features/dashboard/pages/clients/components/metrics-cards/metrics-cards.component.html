@@ -1,0 +1,50 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 flex-shrink-0">
+  <mat-card class="metrics-card">
+    <mat-card-content class="metrics-card-content">
+      <div class="metrics-icon-wrapper bg-t-primary-light text-t-primary">
+        <mat-icon>group</mat-icon>
+      </div>
+      <div class="metrics-text-wrapper">
+        <p class="metrics-label">
+          Clientes Filtrados
+        </p>
+        <p class="metrics-value">
+          {{ metrics?.total ?? 0 }}
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="metrics-card">
+    <mat-card-content class="metrics-card-content">
+      <div class="metrics-icon-wrapper bg-t-success-light text-t-success">
+        <mat-icon>analytics</mat-icon>
+      </div>
+      <div class="metrics-text-wrapper">
+        <p class="metrics-label">
+          Edad Promedio
+        </p>
+        <p class="metrics-value">
+          {{ metrics?.averageAge | number: "1.1-2" }}
+          <span class="metrics-unit">años</span>
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="metrics-card">
+    <mat-card-content class="metrics-card-content">
+      <div class="metrics-icon-wrapper bg-t-warning-light text-t-warning">
+        <mat-icon>adjust</mat-icon>
+      </div>
+      <div class="metrics-text-wrapper">
+        <p class="metrics-label">
+          Desv. Estándar Edad
+        </p>
+        <p class="metrics-value">
+          ± {{ metrics?.standardDeviation | number: "1.1-2" }}
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

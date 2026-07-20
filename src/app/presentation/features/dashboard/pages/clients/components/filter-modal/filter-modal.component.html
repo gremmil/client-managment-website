@@ -1,0 +1,84 @@
+<h2 mat-dialog-title class="text-xl font-bold text-t-text mb-4 flex items-center space-x-2">
+  <ng-icon name="heroFunnel" size="24px" class="text-t-primary"></ng-icon>
+  <span>Filtros</span>
+</h2>
+
+<mat-dialog-content>
+  <form class="space-y-4">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Nombre</mat-label>
+      <input matInput [(ngModel)]="name" name="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Apellido</mat-label>
+      <input matInput [(ngModel)]="lastname" name="lastname" />
+    </mat-form-field>
+
+    <div class="filter-section">
+      <label class="filter-label">Rango de edad</label>
+      <div class="grid grid-cols-2 gap-3">
+        <mat-form-field appearance="fill">
+          <mat-label>Mínimo</mat-label>
+          <input
+            matInput
+            type="number"
+            [(ngModel)]="ageMin"
+            name="ageMin"
+            [min]="data.ageRange.min"
+            [max]="data.ageRange.max"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Máximo</mat-label>
+          <input
+            matInput
+            type="number"
+            [(ngModel)]="ageMax"
+            name="ageMax"
+            [min]="data.ageRange.min"
+            [max]="data.ageRange.max"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <label class="filter-label">Fecha de nacimiento</label>
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Desde</mat-label>
+        <input
+          matInput
+          [matDatepicker]="startPicker"
+          [(ngModel)]="birthDateStart"
+          name="birthDateStart"
+        />
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Hasta</mat-label>
+        <input
+          matInput
+          [matDatepicker]="endPicker"
+          [(ngModel)]="birthDateEnd"
+          name="birthDateEnd"
+        />
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="filter-actions">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="applyFilters()"
+  >
+    Aplicar filtros
+  </button>
+</mat-dialog-actions>

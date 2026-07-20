@@ -1,0 +1,79 @@
+<h2 mat-dialog-title class="text-xl font-bold text-t-text mb-4">
+  Nuevo Cliente
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="space-y-4">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        El nombre es obligatorio.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="lastname" />
+      <mat-error *ngIf="form.get('lastname')?.hasError('required')">
+        El apellido es obligatorio.
+      </mat-error>
+    </mat-form-field>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Edad</mat-label>
+        <input matInput type="number" formControlName="age" />
+        <mat-error *ngIf="form.get('age')?.hasError('required')">
+          Edad obligatoria (mín. 18).
+        </mat-error>
+        <mat-error *ngIf="form.get('age')?.hasError('min')">
+          Debe ser mayor de 18 años.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Nacimiento</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="birthDate"
+          [max]="maxDate"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>Formato: DD/MM/YYYY</mat-hint>
+        <mat-error *ngIf="form.get('birthDate')?.hasError('required')">
+          Fecha obligatoria.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div
+      *ngIf="form.errors && (form.touched || form.dirty)"
+      class="text-t-danger text-sm bg-t-danger-light p-3 rounded-lg"
+    >
+      <p *ngIf="form.errors['underAge']" class="m-0">Debe ser mayor de 18 años.</p>
+      <p *ngIf="form.errors['ageMismatch']" class="m-0">La edad no coincide con la fecha de nacimiento.</p>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="loadingService.isLoading">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="form.invalid || loadingService.isLoading"
+  >
+    <mat-spinner
+      *ngIf="loadingService.isLoading"
+      diameter="18"
+      class="inline-block mr-2"
+    ></mat-spinner>
+    {{ loadingService.isLoading ? 'Guardando...' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>

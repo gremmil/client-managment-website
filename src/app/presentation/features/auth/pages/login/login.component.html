@@ -1,0 +1,92 @@
+<div class="login-container">
+  <!-- Fondo decorativo -->
+  <div class="login-background">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+  </div>
+
+  <!-- Card de Login -->
+  <div class="login-card">
+    <!-- Header con logo y título -->
+    <div class="login-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <mat-icon>admin_panel_settings</mat-icon>
+        </div>
+      </div>
+      <h1 class="login-title">ClientPortal</h1>
+      <p class="login-subtitle">Sistema de Gestión de Clientes</p>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div
+      *ngIf="errorMessage"
+      class="error-alert"
+    >
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+      <!-- Email Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Correo electrónico</mat-label>
+        <input
+          matInput
+          formControlName="email"
+          type="email"
+          autocomplete="email"
+        />
+        <mat-icon matPrefix>email</mat-icon>
+        <mat-error *ngIf="email?.hasError('required')">
+          El correo es obligatorio
+        </mat-error>
+        <mat-error *ngIf="email?.hasError('email')">
+          Formato de email inválido
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Field -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          formControlName="password"
+          type="password"
+          autocomplete="current-password"
+        />
+        <mat-icon matPrefix>lock</mat-icon>
+        <mat-error *ngIf="password?.hasError('required')">
+          La contraseña es obligatoria
+        </mat-error>
+        <mat-error *ngIf="password?.hasError('minlength')">
+          Mínimo 6 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Submit Button -->
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="loginForm.invalid || loadingService.isLoading"
+        class="submit-button"
+      >
+        <mat-spinner
+          *ngIf="loadingService.isLoading"
+          diameter="20"
+          class="button-spinner"
+        ></mat-spinner>
+        <span *ngIf="!loadingService.isLoading">Iniciar Sesión</span>
+        <span *ngIf="loadingService.isLoading">Iniciando...</span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>© {{ currentYear }} ClientPortal. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</div>
