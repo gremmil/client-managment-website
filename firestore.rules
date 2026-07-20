@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /clients/{clientId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 100
+                    && request.resource.data.lastname is string
+                    && request.resource.data.lastname.size() > 0
+                    && request.resource.data.lastname.size() <= 100
+                    && request.resource.data.age is number
+                    && request.resource.data.age >= 18
+                    && request.resource.data.age <= 150
+                    && request.resource.data.birthDate is string
+                    && request.resource.data.birthDate.size() > 0
+                    && request.resource.data.createdAt is timestamp;
+      allow update: if isAuthenticated()
+                    && request.resource.data.age is number
+                    && request.resource.data.age >= 18
+                    && request.resource.data.age <= 150;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
