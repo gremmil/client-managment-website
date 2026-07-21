@@ -59,7 +59,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   private breakpointSub!: Subscription;
 
   readonly rawClients$ = this.stateService.rawData$;
-  readonly metrics$ = this.stateService.metrics$.pipe(tap(console.log));
+  readonly metrics$ = this.stateService.metrics$;
 
   @ViewChild(ClientsTableComponent) tableComponent!: ClientsTableComponent;
 
