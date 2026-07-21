@@ -13,7 +13,7 @@ export interface Client {
   /** @description Edad del cliente */
   age: number;
   /** @description Fecha de nacimiento del cliente en formato de cadena */
-  birthDate: string;
+  birthDate: Date;
   /** @description Fecha de creación del registro */
   createdAt?: string;
   /** @description Fecha de última actualización del registro */
@@ -31,7 +31,7 @@ export interface CreateClientPayload {
   /** @description Edad del cliente */
   age: number;
   /** @description Fecha de nacimiento del cliente en formato de cadena */
-  birthDate: string;
+  birthDate: Date;
 }
 
 /**
@@ -62,7 +62,7 @@ export function validateClient(payload: CreateClientPayload): void {
     throw new ValidationError('age', 'Age is not realistic.');
   }
 
-  if (!payload.birthDate || !payload.birthDate.trim()) {
+  if (!payload.birthDate) {
     throw new ValidationError('birthDate', 'Birth date is required.');
   }
 
@@ -74,15 +74,24 @@ export function validateClient(payload: CreateClientPayload): void {
   const today = new Date();
   let calculatedAge = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     calculatedAge--;
   }
 
   if (calculatedAge !== payload.age) {
-    throw new ValidationError('birthDate', 'Age does not match the birth date.');
+    throw new ValidationError(
+      'birthDate',
+      'Age does not match the birth date.',
+    );
   }
 
   if (birthDate > today) {
-    throw new ValidationError('birthDate', 'Birth date cannot be in the future.');
+    throw new ValidationError(
+      'birthDate',
+      'Birth date cannot be in the future.',
+    );
   }
 }

@@ -38,9 +38,7 @@ export class LoadingDataComponent {
     try {
       await firstValueFrom(this.stateService.preloadData());
       this.loadingMessage = '¡App lista! Redirigiendo...';
-      setTimeout(() => {
-        this.router.navigate(['/dashboard']);
-      }, 500);
+      this.router.navigate(['/dashboard']);
     } catch (err) {
       console.error(err);
       if (err instanceof AppError) {

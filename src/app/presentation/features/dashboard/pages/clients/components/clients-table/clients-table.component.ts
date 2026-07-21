@@ -5,55 +5,34 @@ import {
   Output,
   ViewChild,
   AfterViewInit,
-  OnChanges,
-  SimpleChanges,
-  OnDestroy,
   inject,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule, MatSort } from '@angular/material/sort';
 import {
   MatPaginatorModule,
   MatPaginator,
-  PageEvent,
+  MatPaginatorIntl,
 } from '@angular/material/paginator';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { Client } from 'src/app/domain/models/client.model';
 import { TableFilters } from 'src/app/core/interfaces/client-table.interface';
-import { formatDateToISO } from 'src/app/core/helpers/date.helper';
-import { MatNativeDateModule } from '@angular/material/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { Subscription } from 'rxjs';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import {
-  HeroFunnel,
-  HeroChevronDown,
-  HeroXMark,
-} from '@ng-icons/heroicons/outline';
+import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { FilterModalComponent, FilterModalData, FilterModalResult } from '../filter-modal/filter-modal.component';
-
-/**
- * @description Representa una fila de la tabla de clientes.
- */
-export interface ClientRow {
-  /** @description Identificador único del cliente */
-  id: string;
-  /** @description Nombre del cliente */
-  name: string;
-  /** @description Apellido del cliente */
-  lastname: string;
-  /** @description Edad del cliente */
-  age: number;
-  /** @description Fecha de nacimiento del cliente en formato de cadena */
-  birthDate: string;
-}
+import { FilterModalComponent } from '../filter-modal/filter-modal.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatInputModule } from '@angular/material/input';
+import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MyCustomPaginatorIntl } from './my-custom-paginator-intl.service';
+import { BreakpointService } from 'src/app/core/services/breakpoint.service';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-clients-table',
@@ -65,322 +44,190 @@ export interface ClientRow {
     MatPaginatorModule,
     MatIconModule,
     MatMenuModule,
+    MatButtonModule,
+    MatBadgeModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
+    MatCardModule,
     FormsModule,
-    NgIconsModule,
+    ReactiveFormsModule,
   ],
-  providers: [provideIcons({ HeroFunnel, HeroChevronDown, HeroXMark })],
   templateUrl: './clients-table.component.html',
-  styleUrls: ['./clients-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl }],
 })
 /**
  * @description Componente de tabla para mostrar, filtrar, ordenar y paginar la lista de clientes.
+ * Recibe la lista completa de clientes, aplica filtros internamente de forma reactiva
+ * y emite los datos filtrados hacia el componente padre.
  */
-export class ClientsTableComponent implements AfterViewInit, OnChanges, OnDestroy {
-  /** @description Lista de clientes a mostrar en la tabla */
-  @Input() clients: Client[] = [];
-  /** @description Cantidad total de clientes disponibles para la paginación */
-  @Input() total: number = 0;
-  /** @description Índice de la página actual */
-  @Input() 
-  set pageIndex(value: number) {
-    this._pageIndex = value;
-    if (this.paginator && this.paginator.pageIndex !== value) {
-      this.paginator.pageIndex = value;
-    }
+@AutoUnsubscribe()
+export class ClientsTableComponent implements AfterViewInit {
+  /** @description Lista completa de clientes sin filtrar */
+  @Input() set clients(data: Client[]) {
+    this._clients$.next(data);
   }
-  get pageIndex(): number {
-    return this._pageIndex;
-  }
-  private _pageIndex: number = 0;
-  
-  /** @description Cantidad de elementos por página */
-  @Input() 
-  set pageSize(value: number) {
-    this._pageSize = value;
-    if (this.paginator && this.paginator.pageSize !== value) {
-      this.paginator.pageSize = value;
-    }
-  }
-  get pageSize(): number {
-    return this._pageSize;
-  }
-  private _pageSize: number = 10;
-  
-  /** @description Campo por el cual se está ordenando */
-  @Input()
-  set sortBy(value: string) {
-    this._sortBy = value;
-    this.syncSortUI();
-  }
-  get sortBy(): string {
-    return this._sortBy;
-  }
-  private _sortBy: string = '';
-  
-  /** @description Indica si el ordenamiento es ascendente */
-  @Input()
-  set isAscending(value: boolean) {
-    this._isAscending = value;
-    this.syncSortUI();
-  }
-  get isAscending(): boolean {
-    return this._isAscending;
-  }
-  private _isAscending: boolean = false;
-  
-  /** @description Rango de edades permitido para los filtros de edad */
-  @Input() ageRange: { min: number; max: number } = { min: 18, max: 100 };
 
-  /** @description Emite un evento cuando cambia el ordenamiento de la tabla */
-  @Output() sortChange = new EventEmitter<Sort>();
-  /** @description Emite un evento cuando cambia la página del paginador */
-  @Output() pageChange = new EventEmitter<PageEvent>();
-  /** @description Emite un evento cuando cambian los filtros aplicados */
-  @Output() filterChange = new EventEmitter<TableFilters>();
-  /** @description Emite un evento cuando se solicita limpiar todos los filtros */
-  @Output() clearAllFilters = new EventEmitter<void>();
-
-  /** @description Columnas visibles en la tabla */
-  displayedColumns: string[] = ['name', 'lastname', 'age', 'birthDate'];
-  /** @description Datos transformados que alimentan la tabla */
-  dataSource: ClientRow[] = [];
+  /** @description Emite la lista de clientes filtrados cada vez que cambian los datos o filtros */
+  @Output() filteredClientsChange = new EventEmitter<Client[]>();
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly _clients$ = new BehaviorSubject<Client[]>([]);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
-  private breakpointSub!: Subscription;
-  private sortSub!: Subscription;
+  private readonly breakpointService = inject(BreakpointService);
 
-  /** @description Indica si el dispositivo actual es móvil */
-  isMobile = false;
+  /** @description Observable para gestionar los cambio de los clientes */
+  clients$ = this._clients$.asObservable();
 
-  /** @description Bandera para evitar emisiones del sort durante actualizaciones programáticas */
-  private isUpdatingSort = false;
+  /** @description Formulario Reactivo para gestionar los filtros de la tabla */
+  filterForm = this.formBuilder.group({
+    name: [''],
+    lastname: [''],
+    ageMin: [null as number | null],
+    ageMax: [null as number | null],
+    birthDateStart: [null as Date | null],
+    birthDateEnd: [null as Date | null],
+  });
 
-  /** @description Filtro por nombre del cliente */
-  nameFilter = '';
-  /** @description Filtro por apellido del cliente */
-  lastnameFilter = '';
-  /** @description Filtro de edad mínima */
-  ageMinFilter: number | null = null;
-  /** @description Filtro de edad máxima */
-  ageMaxFilter: number | null = null;
-  /** @description Filtro de fecha de nacimiento inicial */
-  birthDateStartFilter: Date | null = null;
-  /** @description Filtro de fecha de nacimiento final */
-  birthDateEndFilter: Date | null = null;
+  /** @description Columnas visibles en la tabla */
+  displayedColumns: string[] = ['name', 'lastname', 'age', 'birthDate'];
 
-  /**
-   * @description Conecta los eventos de ordenamiento y paginación después de inicializar la vista.
-   * También suscribe al observer de breakpoints para detectar cambios de tamaño de pantalla.
-   */
-  ngAfterViewInit(): void {
-    this.connectViewChildren();
+  /** @description Fuente de datos para Material Table */
+  dataSource = new MatTableDataSource<Client>();
 
-    this.breakpointSub = this.breakpointObserver
-      .observe(['(max-width: 767px)'])
-      .subscribe((result) => {
-        this.isMobile = result.matches;
-        setTimeout(() => {
-          this.connectViewChildren();
-        });
-      });
-  }
-
-  private connectViewChildren(): void {
-    if (this.sort) {
-      if (this.sortSub) {
-        this.sortSub.unsubscribe();
-      }
-      this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
-        if (!this.isUpdatingSort) {
-          this.sortChange.emit(sort);
-        }
-      });
-    }
-  }
-
-  /**
-    * @description Libera los recursos y cancela las suscripciones al destruir el componente.
-    */
-  ngOnDestroy(): void {
-    if (this.breakpointSub) {
-      this.breakpointSub.unsubscribe();
-    }
-    if (this.sortSub) {
-      this.sortSub.unsubscribe();
-    }
-  }
-
-  /**
-    * @description Detecta cambios en las entradas y actualiza el dataSource cuando cambia la lista de clientes.
-    * @param changes - Objeto con los cambios detectados en las propiedades de entrada
-    */
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['clients']) {
-      this.dataSource = this.clients.map((client) => ({
-        id: client.id || '',
-        name: client.name,
-        lastname: client.lastname,
-        age: client.age,
-        birthDate: client.birthDate,
-      }));
-    }
-  }
-
-  /**
-   * @description Emite los filtros actuales al componente padre para aplicar el filtrado de datos.
-   */
-  applyFilters(): void {
-    this.filterChange.emit({
-      name: this.nameFilter,
-      lastname: this.lastnameFilter,
-      ageMin: this.ageMinFilter,
-      ageMax: this.ageMaxFilter,
-      birthDateStart: this.birthDateStartFilter
-        ? formatDateToISO(this.birthDateStartFilter)
-        : '',
-      birthDateEnd: this.birthDateEndFilter
-        ? formatDateToISO(this.birthDateEndFilter)
-        : '',
-    });
-  }
-
-  /**
-   * @description Restablece todos los filtros locales y emite los filtros vacíos.
-   */
-  clearFilters(): void {
-    this.nameFilter = '';
-    this.lastnameFilter = '';
-    this.ageMinFilter = null;
-    this.ageMaxFilter = null;
-    this.birthDateStartFilter = null;
-    this.birthDateEndFilter = null;
-    this.applyFilters();
-  }
-
-  /**
-   * @description Limpia el filtro de nombre y reaplica los filtros.
-   */
-  clearNameFilter(): void {
-    this.nameFilter = '';
-    this.applyFilters();
-  }
-
-  /**
-   * @description Limpia el filtro de apellido y reaplica los filtros.
-   */
-  clearLastnameFilter(): void {
-    this.lastnameFilter = '';
-    this.applyFilters();
-  }
-
-  /**
-   * @description Limpia los filtros de edad mínima y máxima y reaplica los filtros.
-   */
-  clearAgeFilter(): void {
-    this.ageMinFilter = null;
-    this.ageMaxFilter = null;
-    this.applyFilters();
-  }
-
-  /**
-   * @description Limpia los filtros de fecha de nacimiento y reaplica los filtros.
-   */
-  clearBirthDateFilter(): void {
-    this.birthDateStartFilter = null;
-    this.birthDateEndFilter = null;
-    this.applyFilters();
-  }
-
-  /**
-   * @description Limpia todos los filtros locales y notifica al componente padre.
-   */
-  onClearAllFilters(): void {
-    this.clearFilters();
-    this.clearAllFilters.emit();
-  }
+  /** @description Indica si el dispositivo actual es de tipo móvil */
+  isMobile$ = this.breakpointService.isMobile$;
 
   /**
    * @description Calcula la cantidad de filtros activos actualmente.
-   * @returns Número de filtros que tienen un valor asignado
+   * Se utiliza para mostrar el badge en el botón de filtros en móvil.
+   * @returns Número de filtros que tienen un valor asignado.
    */
   get activeFiltersCount(): number {
-    let count = 0;
-    if (this.nameFilter) count++;
-    if (this.lastnameFilter) count++;
-    if (this.ageMinFilter !== null || this.ageMaxFilter !== null) count++;
-    if (this.birthDateStartFilter || this.birthDateEndFilter) count++;
-    return count;
+    const filters = this.filterForm.value;
+    return Object.values(filters).filter((v) => v !== null && v !== '').length;
   }
 
   /**
-    * @description Sincroniza la UI del MatSort con el estado actual del ordenamiento.
-    */
-  private syncSortUI(): void {
-    if (this.sort && this._sortBy) {
-      const direction = this._isAscending ? 'asc' : 'desc';
-      if (this.sort.active !== this._sortBy || this.sort.direction !== direction) {
-        this.isUpdatingSort = true;
-        this.sort.sort({
-          id: this._sortBy,
-          start: direction,
-          disableClear: false,
-        });
-        setTimeout(() => {
-          this.isUpdatingSort = false;
-        });
-      }
+   * @description Conecta el sort y paginator al dataSource e inicializa el flujo reactivo de filtrado.
+   */
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+    // Flujo Reactivo: Combina los datos de entrada con los cambios del formulario
+    combineLatest([
+      this.clients$,
+      this.filterForm.valueChanges.pipe(startWith(this.filterForm.value)),
+    ])
+      .pipe(
+        map(([clients, filters]) =>
+          this.applyCustomFilters(clients, filters as TableFilters),
+        ),
+      )
+      .subscribe((filteredData) => {
+        this.dataSource.data = filteredData;
+        this.filteredClientsChange.emit(filteredData);
+      });
+  }
+
+  /**
+   * @description Aplica la lógica de filtrado personalizada sobre el array de clientes.
+   * @param clients - Lista de clientes a filtrar
+   * @param filters - Objeto con los criterios de filtrado
+   * @returns Lista de clientes que cumplen con todos los filtros
+   * @private
+   */
+  private applyCustomFilters(
+    clients: Client[],
+    filters: TableFilters,
+  ): Client[] {
+    return clients.filter((c) => {
+      const matchName =
+        !filters.name ||
+        c.name.toLowerCase().includes(filters.name.toLowerCase());
+      const matchLastname =
+        !filters.lastname ||
+        c.lastname.toLowerCase().includes(filters.lastname.toLowerCase());
+      const matchAgeMin = filters.ageMin === null || c.age >= filters.ageMin;
+      const matchAgeMax = filters.ageMax === null || c.age <= filters.ageMax;
+      const matchDateStart =
+        !filters.birthDateStart || c.birthDate >= filters.birthDateStart;
+      const matchDateEnd =
+        !filters.birthDateEnd || c.birthDate <= filters.birthDateEnd;
+
+      return (
+        matchName &&
+        matchLastname &&
+        matchAgeMin &&
+        matchAgeMax &&
+        matchDateStart &&
+        matchDateEnd
+      );
+    });
+  }
+
+  /**
+   * @description Restablece un control específico del formulario a su valor inicial (null o string vacío).
+   * @param key - La clave del filtro a limpiar definida en TableFilters.
+   */
+  clearFilter(key: keyof TableFilters): void {
+    const control = this.filterForm.get(key);
+    if (control) {
+      // Si es de tipo texto, limpiamos a '', si es tipo date/number, limpiamos a null
+      const initialValue = typeof control.value === 'string' ? '' : null;
+      control.setValue(initialValue);
     }
   }
 
   /**
-    * @description Maneja el evento de cambio de página directamente desde el template.
-    * @param event - Evento de paginación con el índice y tamaño de página
-    */
-  onPageChange(event: PageEvent): void {
-    this.pageChange.emit(event);
+   * @description Restablece todos los valores del formulario de filtros a su estado inicial.
+   */
+  onClearAllFilters(): void {
+    this.filterForm.reset();
   }
 
   /**
-    * @description Abre el modal de filtros con los valores actuales y actualiza los filtros al cerrar el modal con resultado.
-    */
+   * @description Abre el modal de filtros y actualiza el formulario con el resultado obtenido.
+   */
   openFilterModal(): void {
-    const isMobile = window.innerWidth < 600;
-    
-    const dialogData: FilterModalData = {
-      name: this.nameFilter,
-      lastname: this.lastnameFilter,
-      ageMin: this.ageMinFilter,
-      ageMax: this.ageMaxFilter,
-      birthDateStart: this.birthDateStartFilter,
-      birthDateEnd: this.birthDateEndFilter,
-      ageRange: this.ageRange,
-    };
-
     const dialogRef = this.dialog.open(FilterModalComponent, {
-      width: isMobile ? '95vw' : '500px',
-      maxWidth: isMobile ? '95vw' : '500px',
-      disableClose: false,
+      data: this.filterForm.value,
       panelClass: 'filter-modal',
-      data: dialogData,
     });
 
-    dialogRef.afterClosed().subscribe((result: FilterModalResult | undefined) => {
-      if (result) {
-        this.nameFilter = result.name;
-        this.lastnameFilter = result.lastname;
-        this.ageMinFilter = result.ageMin;
-        this.ageMaxFilter = result.ageMax;
-        this.birthDateStartFilter = result.birthDateStart ? new Date(result.birthDateStart) : null;
-        this.birthDateEndFilter = result.birthDateEnd ? new Date(result.birthDateEnd) : null;
-        this.applyFilters();
-      }
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) this.filterForm.patchValue(result);
     });
+  }
+
+  /**
+   * Verifica si uno o varios campos del formulario de filtros tienen un valor activo.
+   *
+   * @param keys - El nombre de un control del formulario (string) o un arreglo de nombres de controles (string[]).
+   * @returns `true` si al menos uno de los controles especificados tiene un valor truthy (diferente de null, undefined o vacío); de lo contrario, `false`.
+   */
+  isFiltered(keys: string | string[]): boolean {
+    if (Array.isArray(keys)) {
+      return keys.some((key) => !!this.filterForm.get(key)?.value);
+    }
+    return !!this.filterForm.get(keys)?.value;
+  }
+
+  /**
+   * @description Obtiene únicamente los elementos correspondientes a la página actual para la vista móvil.
+   */
+  get paginatedMobileData(): Client[] {
+    if (!this.paginator) {
+      return this.dataSource.filteredData;
+    }
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    return this.dataSource.filteredData.slice(
+      startIndex,
+      startIndex + this.paginator.pageSize,
+    );
   }
 }

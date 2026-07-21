@@ -1,11 +1,18 @@
 <div
-  *ngIf="viewData$ | async as data; else loading"
+  *ngIf="{
+    rawClients: rawClients$ | async,
+    metrics: metrics$ | async,
+  } as data"
   class="p-4 md:p-6 max-w-7xl mx-auto flex flex-col space-y-4 md:space-y-6 flex-1 min-h-0 overflow-hidden h-full"
 >
   <!-- Action Bar responsive -->
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+  <div
+    class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3"
+  >
     <div class="flex-1 min-w-0">
-      <h2 class="text-lg sm:text-xl font-bold text-t-text">Resumen de Clientes</h2>
+      <h2 class="text-lg sm:text-xl font-bold text-t-text">
+        Resumen de Clientes
+      </h2>
       <p class="text-xs sm:text-sm text-t-text-muted">
         Visualiza los indicadores clave y gestiona los registros.
       </p>
@@ -29,7 +36,7 @@
           size="14px"
           class="sm:size-4"
         ></ng-icon>
-        <span>{{ showMetrics ? 'Ocultar métricas' : 'Mostrar métricas' }}</span>
+        <span>{{ showMetrics ? "Ocultar métricas" : "Mostrar métricas" }}</span>
       </button>
 
       <button
@@ -43,7 +50,7 @@
   </div>
 
   <app-metrics-cards
-    *ngIf="showMetrics"
+    *ngIf="showMetrics && data.metrics"
     [metrics]="data.metrics"
   ></app-metrics-cards>
 
@@ -52,26 +59,8 @@
   >
     <app-clients-table
       class="flex-1 min-h-0"
-      [clients]="data.clients"
-      [total]="data.total"
-      [pageIndex]="(pageIndex$ | async) ?? 0"
-      [pageSize]="(pageSize$ | async) ?? 10"
-      [sortBy]="(sortBy$ | async) ?? ''"
-      [isAscending]="(isAscending$ | async) ?? false"
-      [ageRange]="(ageRange$ | async) ?? { min: 18, max: 100 }"
-      (sortChange)="handleSort($event)"
-      (pageChange)="handlePageChange($event)"
-      (filterChange)="handleFilterChange($event)"
-      (clearAllFilters)="handleClearAllFilters()"
+      [clients]="data.rawClients ?? []"
+      (filteredClientsChange)="handleFilteredClientsChange($event)"
     ></app-clients-table>
   </div>
 </div>
-
-<ng-template #loading>
-  <div
-    class="flex flex-col items-center justify-center p-24 text-t-text-muted space-y-4"
-  >
-    <ng-icon name="heroArrowPath" class="animate-spin" size="32px"></ng-icon>
-    <span class="text-sm font-medium">Cargando datos...</span>
-  </div>
-</ng-template>

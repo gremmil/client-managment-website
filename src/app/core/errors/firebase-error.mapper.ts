@@ -1,9 +1,4 @@
-import {
-  AppError,
-  AuthError,
-  FirestoreError,
-  NetworkError,
-} from './app-error';
+import { AppError, AuthError, FirestoreError, NetworkError } from './app-error';
 
 /**
  * @description Mapea un error desconocido (típicamente de Firebase) a una
@@ -12,13 +7,13 @@ import {
  * @returns Instancia de AppError (AuthError, FirestoreError, NetworkError o AppError genérico)
  */
 export function mapFirebaseError(error: unknown): AppError {
-  const fbError = error as { code?: string; message?: string };
+  const fbError = error as { code?: unknown; message?: string };
 
-  if (fbError.code?.startsWith('auth/')) {
+  if (typeof fbError.code === 'string' && fbError.code.startsWith('auth/')) {
     return mapAuthError(fbError as { code: string; message?: string });
   }
 
-  if (fbError.code?.startsWith('firestore/')) {
+  if (typeof fbError.code === 'string' && fbError.code.startsWith('firestore/')) {
     return mapFirestoreError(fbError as { code: string; message?: string });
   }
 
@@ -52,7 +47,8 @@ function mapFirestoreError(error: {
   message?: string;
 }): FirestoreError {
   const messages: Record<string, string> = {
-    'firestore/permission-denied': 'You do not have permission to access this data.',
+    'firestore/permission-denied':
+      'You do not have permission to access this data.',
     'firestore/unavailable': 'Firestore service is temporarily unavailable.',
     'firestore/not-found': 'The requested data was not found.',
   };

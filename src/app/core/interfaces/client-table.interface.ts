@@ -11,9 +11,9 @@ export interface TableFilters {
   /** Edad máxima del rango */
   ageMax: number | null;
   /** Fecha de inicio del rango de nacimiento */
-  birthDateStart: string | null;
+  birthDateStart: Date | null;
   /** Fecha de fin del rango de nacimiento */
-  birthDateEnd: string | null;
+  birthDateEnd: Date | null;
 }
 
 /**

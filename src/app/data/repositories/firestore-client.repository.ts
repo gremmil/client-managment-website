@@ -13,9 +13,15 @@ import {
 } from '@angular/fire/firestore';
 import { Observable, from, map } from 'rxjs';
 import { ClientRepository } from 'src/app/domain/repositories/client.repository';
-import { Client, CreateClientPayload } from 'src/app/domain/models/client.model';
+import {
+  Client,
+  CreateClientPayload,
+} from 'src/app/domain/models/client.model';
 import { ClientDTO } from 'src/app/data/dtos/client.dto';
-import { clientDTOToDomain, createPayloadToDTO } from 'src/app/data/mappers/client.mapper';
+import {
+  clientDTOToDomain,
+  createPayloadToDTO,
+} from 'src/app/data/mappers/client.mapper';
 import { handleErrors } from 'src/app/core/errors';
 
 /**
@@ -54,7 +60,11 @@ export class FirestoreClientRepository extends ClientRepository {
       ...dto,
       createdAt: new Date().toISOString(),
     };
-    return from(addDoc(this.clientsCollection, clientWithTimestamp) as Promise<DocumentReference<ClientDTO>>).pipe(
+    return from(
+      addDoc(this.clientsCollection, clientWithTimestamp) as Promise<
+        DocumentReference<ClientDTO>
+      >,
+    ).pipe(
       handleErrors(),
       map((docRef) => {
         const newClient: Client = clientDTOToDomain({
@@ -78,10 +88,12 @@ export class FirestoreClientRepository extends ClientRepository {
     const ref = doc(this.clientsCollection, id);
     const payload: Partial<ClientDTO> = {
       ...changes,
+      birthDate:
+        changes.birthDate instanceof Date
+          ? changes.birthDate.toISOString()
+          : changes.birthDate,
       updatedAt: new Date().toISOString(),
     };
-    return from(updateDoc(ref, payload) as Promise<void>).pipe(
-      handleErrors(),
-    );
+    return from(updateDoc(ref, payload) as Promise<void>).pipe(handleErrors());
   }
 }

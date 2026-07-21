@@ -1,5 +1,9 @@
-import { Client, CreateClientPayload } from 'src/app/domain/models/client.model';
+import {
+  Client,
+  CreateClientPayload,
+} from 'src/app/domain/models/client.model';
 import { ClientDTO } from 'src/app/data/dtos/client.dto';
+import { formatDateToISO } from 'src/app/core/helpers';
 
 /**
  * @description Convierte un DTO de cliente proveniente de Firestore a una entidad
@@ -13,7 +17,7 @@ export function clientDTOToDomain(dto: ClientDTO): Client {
     name: dto.name,
     lastname: dto.lastname,
     age: dto.age,
-    birthDate: dto.birthDate,
+    birthDate: new Date(dto.birthDate),
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
   };
@@ -31,7 +35,7 @@ export function clientDomainToDTO(client: Client): ClientDTO {
     name: client.name,
     lastname: client.lastname,
     age: client.age,
-    birthDate: client.birthDate,
+    birthDate: formatDateToISO(client.birthDate),
     createdAt: client.createdAt,
     updatedAt: client.updatedAt,
   };
@@ -43,11 +47,13 @@ export function clientDomainToDTO(client: Client): ClientDTO {
  * @param payload - Datos del nuevo cliente a crear
  * @returns DTO parcial sin los campos generados por el sistema
  */
-export function createPayloadToDTO(payload: CreateClientPayload): Omit<ClientDTO, 'id' | 'createdAt' | 'updatedAt'> {
+export function createPayloadToDTO(
+  payload: CreateClientPayload,
+): Omit<ClientDTO, 'id' | 'createdAt' | 'updatedAt'> {
   return {
     name: payload.name.trim(),
     lastname: payload.lastname.trim(),
     age: payload.age,
-    birthDate: payload.birthDate,
+    birthDate: formatDateToISO(payload.birthDate),
   };
 }

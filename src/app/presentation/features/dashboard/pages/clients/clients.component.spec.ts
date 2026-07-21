@@ -15,14 +15,11 @@ describe('ClientsComponent', () => {
         {
           provide: ClientsStateService,
           useValue: {
-            getClientsData$: () => of({ clients: [], total: 0, metrics: { total: 0, averageAge: 0, standardDeviation: 0 } }),
-            currentUiState: { pageIndex: 0, pageSize: 10, sortBy: '', isAscending: true, filters: {} },
+            rawClients: of([]),
+            metrics$: of({ total: 0, averageAge: 0, standardDeviation: 0 }),
             addClient: () => of({}),
-            setFilters: jasmine.createSpy('setFilters'),
-            resetState: jasmine.createSpy('resetState'),
-            setPage: jasmine.createSpy('setPage'),
-            setPageSize: jasmine.createSpy('setPageSize'),
-            setSorting: jasmine.createSpy('setSorting'),
+            updateFilteredData: jasmine.createSpy('updateFilteredData'),
+            resetFilteredData: jasmine.createSpy('resetFilteredData'),
           },
         },
         { provide: ToastService, useValue: { show: jasmine.createSpy('show') } },

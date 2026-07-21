@@ -1,0 +1,84 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Tipografía compartida
+$app-typography: mat.define-typography-config(
+  $font-family: 'Inter, Roboto, "Helvetica Neue", sans-serif',
+);
+
+// ============================================
+// Theme 1: Deep Purple / Amber (Light)
+// ============================================
+$deeppurple-amber-primary: mat.define-palette(mat.$deep-purple-palette);
+$deeppurple-amber-accent: mat.define-palette(mat.$amber-palette);
+$deeppurple-amber-theme: mat.define-light-theme((
+  color: (
+    primary: $deeppurple-amber-primary,
+    accent: $deeppurple-amber-accent,
+  ),
+  typography: $app-typography,
+  density: 0,
+));
+
+// ============================================
+// Theme 2: Indigo / Pink (Light)
+// ============================================
+$indigo-pink-primary: mat.define-palette(mat.$indigo-palette);
+$indigo-pink-accent: mat.define-palette(mat.$pink-palette);
+$indigo-pink-theme: mat.define-light-theme((
+  color: (
+    primary: $indigo-pink-primary,
+    accent: $indigo-pink-accent,
+  ),
+  typography: $app-typography,
+  density: 0,
+));
+
+// ============================================
+// Theme 3: Pink / Blue-Grey (Dark)
+// ============================================
+$pink-bluegrey-primary: mat.define-palette(mat.$pink-palette);
+$pink-bluegrey-accent: mat.define-palette(mat.$blue-grey-palette);
+$pink-bluegrey-theme: mat.define-dark-theme((
+  color: (
+    primary: $pink-bluegrey-primary,
+    accent: $pink-bluegrey-accent,
+  ),
+  typography: $app-typography,
+  density: 0,
+));
+
+// ============================================
+// Theme 4: Purple / Green (Dark)
+// ============================================
+$purple-green-primary: mat.define-palette(mat.$purple-palette);
+$purple-green-accent: mat.define-palette(mat.$green-palette);
+$purple-green-theme: mat.define-dark-theme((
+  color: (
+    primary: $purple-green-primary,
+    accent: $purple-green-accent,
+  ),
+  typography: $app-typography,
+  density: 0,
+));
+
+// ============================================
+// Aplicar tema por defecto (Deep Purple / Amber)
+// ============================================
+@include mat.all-component-themes($deeppurple-amber-theme);
+
+// ============================================
+// Clases para cambiar de tema dinámicamente
+// ============================================
+.theme-indigo-pink {
+  @include mat.all-component-colors($indigo-pink-theme);
+}
+
+.theme-pink-bluegrey {
+  @include mat.all-component-colors($pink-bluegrey-theme);
+}
+
+.theme-purple-green {
+  @include mat.all-component-colors($purple-green-theme);
+}

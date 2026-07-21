@@ -1,284 +1,124 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, shareReplay, tap, take } from 'rxjs/operators';
-import { Client, CreateClientPayload } from 'src/app/domain/models/client.model';
+import {
+  Client,
+  CreateClientPayload,
+} from 'src/app/domain/models/client.model';
 import { GetClientsUseCase } from 'src/app/domain/use-cases/get-clients.use-case';
 import { CreateClientUseCase } from 'src/app/domain/use-cases/create-client.use-case';
 import {
   calculateAverage,
   calculateStandardDeviation,
 } from 'src/app/core/helpers/math.helper';
-import {
-  filterClients,
-  sortClients,
-} from 'src/app/core/helpers/client-table.helper';
-import { TableFilters, Metrics } from 'src/app/core/interfaces/client-table.interface';
+import { Metrics } from 'src/app/core/interfaces/client-table.interface';
+import { formatDateToISO } from 'src/app/core/helpers/date.helper';
 
 /**
- * @description Representa el estado de la interfaz de usuario para la tabla de clientes,
- * incluyendo paginación, ordenamiento y filtros activos.
- */
-export interface ClientsState {
-  /** @description Índice de la página actual (basado en 0) */
-  pageIndex: number;
-  /** @description Cantidad de elementos mostrados por página */
-  pageSize: number;
-  /** @description Campo por el cual se ordena la tabla, o cadena vacía si no hay ordenamiento */
-  sortBy: keyof Client | '';
-  /** @description Indica si el ordenamiento es ascendente (true) o descendente (false) */
-  isAscending: boolean;
-  /** @description Objeto con los filtros activos para la tabla de clientes */
-  filters: TableFilters;
-}
-
-/**
- * @description Servicio encargado de gestionar el estado global de la tabla de clientes.
- * Centraliza la carga de datos, filtros, ordenamiento, paginación y métricas,
- * exponiendo observables reactivos para los componentes de la interfaz.
- *
- * @example
- * ```ts
- * const state = inject(ClientsStateService);
- * state.preloadData().subscribe();
- * state.getClientsData$().subscribe(data => console.log(data));
- * ```
+ * @description Servicio de estado centralizado para la gestión de clientes.
+ * Mantiene la fuente de verdad (raw y filtered) y deriva las métricas automáticamente
+ * mediante operadores reactivos.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class ClientsStateService {
-  private readonly getClientsUseCase = inject(GetClientsUseCase);
-  private readonly createClientUseCase = inject(CreateClientUseCase);
-  private readonly rawClients$ = new BehaviorSubject<Client[]>([]);
-  private readonly uiState$ = new BehaviorSubject<ClientsState>({
-    pageIndex: 0,
-    pageSize: 10,
-    sortBy: 'createdAt',
-    isAscending: false,
-    filters: {
-      name: '',
-      lastname: '',
-      ageMin: null,
-      ageMax: null,
-      birthDateStart: null,
-      birthDateEnd: null,
-    },
-  });
+  private readonly _getClientsUseCase = inject(GetClientsUseCase);
+  private readonly _createClientUseCase = inject(CreateClientUseCase);
+
+  // Subjects privados para el estado interno
+  private readonly _rawData$ = new BehaviorSubject<Client[]>([]);
+  private readonly _filteredData$ = new BehaviorSubject<Client[]>([]);
+
+  // Observables públicos
+  public readonly rawData$: Observable<Client[]> =
+    this._rawData$.asObservable();
+  public readonly filteredData$: Observable<Client[]> =
+    this._filteredData$.asObservable();
 
   /**
-   * @description Obtiene el estado actual de la interfaz de usuario de forma síncrona.
-   * @returns El valor actual de ClientsState
+   * @description Observable de métricas. Se recalcula automáticamente cada vez
+   * que _filteredData$ emite un nuevo valor.
    */
-  get currentUiState() {
-    return this.uiState$.value;
-  }
+  public readonly metrics$: Observable<Metrics> = this._filteredData$.pipe(
+    map((clients) => this._calculateMetrics(clients)),
+    shareReplay({ bufferSize: 1, refCount: false }),
+  );
 
   /**
-   * @description Precarga la lista de clientes desde el repositorio y actualiza el estado interno.
-   * @returns Observable que emite el array de clientes obtenidos
+   * @description Precarga los clientes desde el repositorio y normaliza las fechas a objetos Date.
    */
-  preloadData(): Observable<Client[]> {
-    return this.getClientsUseCase.execute().pipe(
+  public preloadData(): Observable<Client[]> {
+    return this._getClientsUseCase.execute().pipe(
       take(1),
-      tap((clients) => this.rawClients$.next(clients)),
+      map((clients) =>
+        clients.map((client) => ({
+          ...client,
+          birthDate: client.birthDate
+            ? new Date(client.birthDate)
+            : client.birthDate,
+        })),
+      ),
+      tap((clients) => {
+        this._rawData$.next(clients);
+        this._filteredData$.next(clients);
+      }),
     );
   }
 
   /**
-   * @description Verifica si los datos de clientes ya han sido cargados.
-   * @returns true si existen clientes en el estado interno
+   * @description Verifica si existen datos cargados.
    */
-  hasDataLoaded(): boolean {
-    return this.rawClients$.value.length > 0;
+  public hasDataLoaded(): boolean {
+    return this._rawData$.value.length > 0;
   }
 
   /**
-   * @description Crea un nuevo cliente y lo agrega al inicio de la lista interna.
-   * @param payload - Datos necesarios para crear el cliente
-   * @returns Observable que emite el cliente recién creado
+   * @description Crea un cliente, convierte la fecha a formato ISO para la API,
+   * y luego normaliza la respuesta para mantener la consistencia del estado.
    */
-  addClient(payload: CreateClientPayload): Observable<Client> {
-    return this.createClientUseCase.execute(payload).pipe(
+  public addClient(payload: CreateClientPayload): Observable<Client> {
+    return this._createClientUseCase.execute(payload).pipe(
       take(1),
+      // Normalizamos la respuesta de la API a Date antes de guardarla en el estado
+      map((newClient) => ({
+        ...newClient,
+        birthDate: new Date(newClient.birthDate),
+      })),
       tap((newClient) => {
-        const currentClients = this.rawClients$.value;
-        this.rawClients$.next([newClient, ...currentClients]);
+        this._rawData$.next([newClient, ...this._rawData$.value]);
+        this._filteredData$.next([newClient, ...this._filteredData$.value]);
       }),
     );
   }
 
   /**
-    * @description Devuelve un observable reactivo que combina los clientes crudos con el estado
-    * de la interfaz (filtros, ordenamiento y paginación), emitiendo los datos procesados
-    * junto con el total y las métricas calculadas.
-    * @returns Observable con los clientes paginados, el total filtrado y las métricas
-    */
-  getClientsData$(): Observable<{
-    clients: Client[];
-    total: number;
-    metrics: Metrics;
-  }> {
-    return combineLatest([
-      this.rawClients$.asObservable(),
-      this.uiState$.asObservable(),
-    ]).pipe(
-      map(([rawClients, uiState]) => {
-        const filtered = filterClients(rawClients, uiState.filters);
-        const ages = filtered.map((c) => c.age).filter((age) => !isNaN(age));
-        const averageAge = calculateAverage(ages);
-        const standardDeviation = calculateStandardDeviation(ages, averageAge);
-        const metrics: Metrics = {
-          total: filtered.length,
-          averageAge,
-          standardDeviation,
-        };
-        const sorted = sortClients(
-          filtered,
-          uiState.sortBy,
-          uiState.isAscending,
-        );
-        const start = uiState.pageIndex * uiState.pageSize;
-        const paginated = sorted.slice(start, start + uiState.pageSize);
-
-        return {
-          clients: paginated,
-          total: filtered.length,
-          metrics,
-        };
-      }),
-      shareReplay({ bufferSize: 1, refCount: true }),
-    );
-  }
-
-  /**
-    * @description Devuelve un observable con el índice de página actual.
-    * @returns Observable con el pageIndex
-    */
-  get pageIndex$(): Observable<number> {
-    return this.uiState$.asObservable().pipe(map((state) => state.pageIndex));
-  }
-
-  /**
-    * @description Devuelve un observable con el tamaño de página actual.
-    * @returns Observable con el pageSize
-    */
-  get pageSize$(): Observable<number> {
-    return this.uiState$.asObservable().pipe(map((state) => state.pageSize));
-  }
-
-  /**
-    * @description Devuelve un observable con el campo de ordenamiento actual.
-    * @returns Observable con el sortBy
-    */
-  get sortBy$(): Observable<string> {
-    return this.uiState$.asObservable().pipe(map((state) => state.sortBy as string));
-  }
-
-  /**
-    * @description Devuelve un observable con la dirección de ordenamiento actual.
-    * @returns Observable con isAscending
-    */
-  get isAscending$(): Observable<boolean> {
-    return this.uiState$.asObservable().pipe(map((state) => state.isAscending));
-  }
-
-  /**
-   * @description Calcula el rango de edades (mínimo y máximo) de los clientes cargados.
-   * Si no hay edades válidas, devuelve un rango por defecto de 18 a 100.
-   * @returns Observable con el objeto { min, max } del rango de edades
+   * @description Actualiza el estado filtrado (ej. desde el componente de tabla).
    */
-  get ageRange$(): Observable<{ min: number; max: number }> {
-    return this.rawClients$.asObservable().pipe(
-      map((clients) => {
-        const ages = clients.map((c) => c.age).filter((age) => !isNaN(age));
-        if (ages.length === 0) {
-          return { min: 18, max: 100 };
-        }
-        return {
-          min: Math.min(...ages),
-          max: Math.max(...ages),
-        };
-      }),
-    );
+  public updateFilteredData(clients: Client[]): void {
+    this._filteredData$.next(clients);
   }
 
   /**
-   * @description Actualiza los filtros activos y reinicia la paginación a la primera página.
-   * @param filters - Objeto con los nuevos filtros a aplicar
+   * @description Restablece los filtros a la lista original.
    */
-  setFilters(filters: TableFilters): void {
-    this.uiState$.next({ ...this.currentUiState, pageIndex: 0, filters });
+  public resetFilteredData(): void {
+    this._filteredData$.next(this._rawData$.value);
   }
 
   /**
-   * @description Actualiza el criterio de ordenamiento. Si ya se estaba ordenando por la misma
-   * columna, invierte la dirección; de lo contrario, ordena de forma ascendente.
-   * Reinicia la paginación a la primera página.
-   * @param column - Campo del modelo Client por el cual ordenar
+   * @description Función pura que abstrae la lógica matemática de las métricas.
+   * @private
    */
-  setSorting(column: keyof Client, isAscending: boolean): void {
-    this.uiState$.next({
-      ...this.currentUiState,
-      pageIndex: 0,
-      sortBy: column,
-      isAscending,
-    });
-  }
+  private _calculateMetrics(clients: Client[]): Metrics {
+    const ages = clients.map((c) => c.age).filter((age) => !isNaN(age));
+    const averageAge = calculateAverage(ages);
+    const standardDeviation = calculateStandardDeviation(ages, averageAge);
 
-  resetSorting(): void {
-    this.uiState$.next({
-      ...this.currentUiState,
-      pageIndex: 0,
-      sortBy: 'createdAt',
-      isAscending: false,
-    });
-  }
-
-  /**
-   * @description Actualiza el índice de la página actual.
-   * @param index - Índice de la página a mostrar (basado en 0)
-   */
-  setPage(index: number): void {
-    this.uiState$.next({ ...this.currentUiState, pageIndex: index });
-  }
-
-  /**
-    * @description Actualiza la cantidad de elementos por página, limitando el valor entre 10 y 100.
-    * Solo reinicia la paginación a la primera página si el tamaño realmente cambió.
-    * @param size - Nueva cantidad de elementos por página
-    */
-  setPageSize(size: number): void {
-    const newSize = Math.max(10, Math.min(100, size));
-    const currentPageSize = this.currentUiState.pageSize;
-    
-    if (newSize !== currentPageSize) {
-      this.uiState$.next({
-        ...this.currentUiState,
-        pageIndex: 0,
-        pageSize: newSize,
-      });
-    }
-  }
-
-  /**
-   * @description Restablece el estado de la interfaz a sus valores por defecto,
-   * conservando únicamente el tamaño de página actual.
-   */
-  resetState(): void {
-    const currentPageSize = this.currentUiState.pageSize;
-    this.uiState$.next({
-      pageIndex: 0,
-      pageSize: currentPageSize,
-      sortBy: 'createdAt',
-      isAscending: false,
-      filters: {
-        name: '',
-        lastname: '',
-        ageMin: null,
-        ageMax: null,
-        birthDateStart: null,
-        birthDateEnd: null,
-      },
-    });
+    return {
+      total: clients.length,
+      averageAge,
+      standardDeviation,
+    };
   }
 }

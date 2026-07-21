@@ -5,10 +5,8 @@ import { NgIconsModule, provideIcons } from '@ng-icons/core';
 import {
   HeroUsers,
   HeroArrowRightOnRectangle,
-  HeroSun,
-  HeroMoon,
-  HeroStar,
   HeroChevronDown,
+  HeroPaintBrush,
 } from '@ng-icons/heroicons/outline';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { ThemeId } from 'src/app/core/interfaces/theme.interface';
@@ -25,10 +23,8 @@ import { ThemeId } from 'src/app/core/interfaces/theme.interface';
     provideIcons({
       HeroUsers,
       HeroArrowRightOnRectangle,
-      HeroSun,
-      HeroMoon,
-      HeroStar,
       HeroChevronDown,
+      HeroPaintBrush,
     }),
   ],
   templateUrl: './sidebar.component.html',
@@ -78,16 +74,18 @@ export class SidebarComponent {
   }
 
   /**
-   * @description Obtiene el nombre del ícono correspondiente al tema activo.
-   * @returns Nombre del ícono de Heroicons asociado al tema actual.
+   * @description Obtiene el tema activo actual.
+   * @returns El tema activo actual
    */
-  getThemeIcon(): string {
-    const theme = this.themeService.currentTheme;
-    switch (theme) {
-      case 'light': return 'heroSun';
-      case 'dark': return 'heroMoon';
-      case 'midnight': return 'heroStar';
-      default: return 'heroSun';
-    }
+  get activeTheme(): ThemeId {
+    return this.themeService.currentTheme;
+  }
+
+  /**
+   * @description Obtiene la lista de temas disponibles.
+   * @returns Array de opciones de tema
+   */
+  get themes() {
+    return this.themeService.themes;
   }
 }
