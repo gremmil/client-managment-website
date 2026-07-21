@@ -1,92 +1,133 @@
-<div class="login-container">
-  <!-- Fondo decorativo -->
-  <div class="login-background">
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-    <div class="bg-shape shape-3"></div>
-  </div>
-
-  <!-- Card de Login -->
-  <div class="login-card">
-    <!-- Header con logo y título -->
-    <div class="login-header">
-      <div class="logo-container">
-        <div class="logo-icon">
-          <mat-icon>admin_panel_settings</mat-icon>
-        </div>
-      </div>
-      <h1 class="login-title">ClientPortal</h1>
-      <p class="login-subtitle">Sistema de Gestión de Clientes</p>
-    </div>
-
-    <!-- Mensaje de error -->
+<div class="relative h-screen flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
     <div
-      *ngIf="errorMessage"
-      class="error-alert"
-    >
-      <mat-icon class="error-icon">error_outline</mat-icon>
-      <span>{{ errorMessage }}</span>
-    </div>
-
-    <!-- Formulario -->
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
-      <!-- Email Field -->
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Correo electrónico</mat-label>
-        <input
-          matInput
-          formControlName="email"
-          type="email"
-          autocomplete="email"
-        />
-        <mat-icon matPrefix>email</mat-icon>
-        <mat-error *ngIf="email?.hasError('required')">
-          El correo es obligatorio
-        </mat-error>
-        <mat-error *ngIf="email?.hasError('email')">
-          Formato de email inválido
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Password Field -->
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Contraseña</mat-label>
-        <input
-          matInput
-          formControlName="password"
-          type="password"
-          autocomplete="current-password"
-        />
-        <mat-icon matPrefix>lock</mat-icon>
-        <mat-error *ngIf="password?.hasError('required')">
-          La contraseña es obligatoria
-        </mat-error>
-        <mat-error *ngIf="password?.hasError('minlength')">
-          Mínimo 6 caracteres
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Submit Button -->
-      <button
-        mat-flat-button
-        color="primary"
-        type="submit"
-        [disabled]="loginForm.invalid || loadingService.isLoading"
-        class="submit-button"
-      >
-        <mat-spinner
-          *ngIf="loadingService.isLoading"
-          diameter="20"
-          class="button-spinner"
-        ></mat-spinner>
-        <span *ngIf="!loadingService.isLoading">Iniciar Sesión</span>
-        <span *ngIf="loadingService.isLoading">Iniciando...</span>
-      </button>
-    </form>
-
-    <!-- Footer -->
-    <div class="login-footer">
-      <p>© {{ currentYear }} ClientPortal. Todos los derechos reservados.</p>
-    </div>
+      class="absolute rounded-full blur-3xl"
+      style="
+        width: 500px;
+        height: 500px;
+        background: var(--color-primary);
+        top: -250px;
+        right: -100px;
+        opacity: 0.15;
+        animation: float 20s infinite ease-in-out;
+      "
+    ></div>
+    <div
+      class="absolute rounded-full blur-3xl"
+      style="
+        width: 400px;
+        height: 400px;
+        background: var(--color-primary-hover);
+        bottom: -200px;
+        left: -100px;
+        opacity: 0.15;
+        animation: float 20s infinite ease-in-out;
+        animation-delay: -5s;
+      "
+    ></div>
+    <div
+      class="absolute rounded-full blur-3xl"
+      style="
+        width: 300px;
+        height: 300px;
+        background: var(--color-primary-text);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.15;
+        animation: float 20s infinite ease-in-out;
+        animation-delay: -10s;
+      "
+    ></div>
   </div>
+
+  <mat-card
+    class="relative z-10 w-full max-w-[440px] mx-4 !rounded-2xl border border-t-border"
+  >
+    <mat-card-content>
+      <div class="text-center mb-8">
+        <div class="mb-4">
+          <div
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-t-primary to-t-primary-hover rounded-2xl shadow-lg"
+          >
+            <mat-icon class="!text-[32px] !w-8 !h-8 text-white"
+              >admin_panel_settings</mat-icon
+            >
+          </div>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">ClientPortal</h1>
+        <p class="text-sm text-t-text-muted">Sistema de Gestión de Clientes</p>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="flex items-center gap-3 px-4 py-3 bg-t-danger-light border border-t-danger rounded-xl mb-6 text-t-danger text-sm"
+      >
+        <mat-icon class="!text-xl !w-5 !h-5 shrink-0">error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onLogin()"
+        class="flex flex-col gap-2"
+      >
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Correo electrónico</mat-label>
+          <input
+            matInput
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+          />
+          <mat-icon matPrefix class="text-t-text-muted">email</mat-icon>
+          <mat-error *ngIf="email?.hasError('required')"
+            >El correo es obligatorio</mat-error
+          >
+          <mat-error *ngIf="email?.hasError('email')"
+            >Formato de email inválido</mat-error
+          >
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            type="password"
+            autocomplete="current-password"
+          />
+          <mat-icon matPrefix class="text-t-text-muted">lock</mat-icon>
+          <mat-error *ngIf="password?.hasError('required')"
+            >La contraseña es obligatoria</mat-error
+          >
+          <mat-error *ngIf="password?.hasError('minlength')"
+            >Mínimo 6 caracteres</mat-error
+          >
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="loginForm.invalid || loadingService.isLoading"
+          class="w-full h-12 mt-4 text-base font-semibold tracking-wide rounded-xl"
+        >
+          <mat-spinner
+            *ngIf="loadingService.isLoading"
+            diameter="20"
+            class="inline-block align-middle mr-2"
+          ></mat-spinner>
+          <span *ngIf="!loadingService.isLoading">Iniciar Sesión</span>
+          <span *ngIf="loadingService.isLoading">Iniciando...</span>
+        </button>
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-t-border-light text-center">
+        <p class="m-0 text-xs text-t-text-muted">
+          &copy; {{ currentYear }} ClientPortal. Todos los derechos reservados.
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

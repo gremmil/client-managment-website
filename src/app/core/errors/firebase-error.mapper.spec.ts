@@ -8,7 +8,7 @@ describe('mapFirebaseError', () => {
 
     expect(result).toBeInstanceOf(AuthError);
     expect(result.code).toBe('auth/invalid-credential');
-    expect(result.message).toBe('Invalid email or password.');
+    expect(result.message).toBe('Correo o contraseña incorrectos.');
   });
 
   it('should map auth/user-not-found to AuthError with generic message', () => {
@@ -16,7 +16,7 @@ describe('mapFirebaseError', () => {
     const result = mapFirebaseError(error);
 
     expect(result).toBeInstanceOf(AuthError);
-    expect(result.message).toBe('Invalid email or password.');
+    expect(result.message).toBe('Correo o contraseña incorrectos.');
   });
 
   it('should map auth/too-many-requests to AuthError', () => {
@@ -24,7 +24,7 @@ describe('mapFirebaseError', () => {
     const result = mapFirebaseError(error);
 
     expect(result).toBeInstanceOf(AuthError);
-    expect(result.message).toBe('Too many attempts. Try again later.');
+    expect(result.message).toBe('Demasiados intentos. Intenta de nuevo más tarde.');
   });
 
   it('should map auth/network-request-failed to AuthError', () => {
@@ -32,7 +32,7 @@ describe('mapFirebaseError', () => {
     const result = mapFirebaseError(error);
 
     expect(result).toBeInstanceOf(AuthError);
-    expect(result.message).toBe('Network error. Check your connection.');
+    expect(result.message).toBe('Error de red. Verifica tu conexión.');
   });
 
   it('should map unknown auth codes to AuthError with raw message', () => {
@@ -48,7 +48,7 @@ describe('mapFirebaseError', () => {
     const result = mapFirebaseError(error);
 
     expect(result).toBeInstanceOf(FirestoreError);
-    expect(result.message).toBe('You do not have permission to access this data.');
+    expect(result.message).toBe('No tienes permiso para acceder a estos datos.');
   });
 
   it('should map firestore/unavailable to FirestoreError', () => {
@@ -56,7 +56,7 @@ describe('mapFirebaseError', () => {
     const result = mapFirebaseError(error);
 
     expect(result).toBeInstanceOf(FirestoreError);
-    expect(result.message).toBe('Firestore service is temporarily unavailable.');
+    expect(result.message).toBe('El servicio de base de datos no está disponible temporalmente.');
   });
 
   it('should map TimeoutError to NetworkError', () => {
@@ -74,7 +74,7 @@ describe('mapFirebaseError', () => {
 
     expect(result).toBeInstanceOf(AppError);
     expect(result.code).toBe('unknown');
-    expect(result.message).toBe('An unexpected error occurred.');
+    expect(result.message).toBe('Ocurrió un error inesperado.');
   });
 
   it('should handle null/undefined errors', () => {

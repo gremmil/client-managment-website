@@ -21,23 +21,23 @@ export function mapFirebaseError(error: unknown): AppError {
     return new NetworkError(error);
   }
 
-  return new AppError('unknown', 'An unexpected error occurred.', error);
+  return new AppError('unknown', 'Ocurrió un error inesperado.', error);
 }
 
 function mapAuthError(error: { code: string; message?: string }): AuthError {
   const messages: Record<string, string> = {
-    'auth/invalid-credential': 'Invalid email or password.',
-    'auth/invalid-login-credentials': 'Invalid email or password.',
-    'auth/user-not-found': 'Invalid email or password.',
-    'auth/wrong-password': 'Invalid email or password.',
-    'auth/too-many-requests': 'Too many attempts. Try again later.',
-    'auth/network-request-failed': 'Network error. Check your connection.',
+    'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+    'auth/invalid-login-credentials': 'Correo o contraseña incorrectos.',
+    'auth/user-not-found': 'Correo o contraseña incorrectos.',
+    'auth/wrong-password': 'Correo o contraseña incorrectos.',
+    'auth/too-many-requests': 'Demasiados intentos. Intenta de nuevo más tarde.',
+    'auth/network-request-failed': 'Error de red. Verifica tu conexión.',
     'auth/timeout':
-      'The server took too long to respond. Please check your internet connection.',
+      'El servidor tardó demasiado en responder. Verifica tu conexión a internet.',
   };
   return new AuthError(
     error.code,
-    messages[error.code] ?? error.message ?? 'Auth error.',
+    messages[error.code] ?? error.message ?? 'Error de autenticación.',
     error,
   );
 }
@@ -48,13 +48,13 @@ function mapFirestoreError(error: {
 }): FirestoreError {
   const messages: Record<string, string> = {
     'firestore/permission-denied':
-      'You do not have permission to access this data.',
-    'firestore/unavailable': 'Firestore service is temporarily unavailable.',
-    'firestore/not-found': 'The requested data was not found.',
+      'No tienes permiso para acceder a estos datos.',
+    'firestore/unavailable': 'El servicio de base de datos no está disponible temporalmente.',
+    'firestore/not-found': 'Los datos solicitados no se encontraron.',
   };
   return new FirestoreError(
     error.code,
-    messages[error.code] ?? error.message ?? 'Firestore error.',
+    messages[error.code] ?? error.message ?? 'Error de base de datos.',
     error,
   );
 }
