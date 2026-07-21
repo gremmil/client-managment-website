@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +9,7 @@ import { Metrics } from 'src/app/core/interfaces/client-table.interface';
   standalone: true,
   imports: [CommonModule, MatCardModule, MatIconModule],
   templateUrl: './metrics-cards.component.html',
-  styleUrls: ['./metrics-cards.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * @description Componente que muestra las tarjetas de métricas de los clientes.

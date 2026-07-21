@@ -1,26 +1,18 @@
-<div
-  class="fixed inset-0 bg-t-bg flex flex-col items-center justify-center text-t-text p-6"
->
-  <ng-icon name="heroExclamationTriangle" size="64px" class="text-t-danger mb-4"></ng-icon>
-  <h1 class="text-xl font-bold tracking-wide text-t-danger">Error de conexión</h1>
+<div class="fixed inset-0 bg-t-bg flex flex-col items-center justify-center p-6">
+  <mat-icon fontIcon="warning" class="text-t-danger mb-4 !text-5xl !w-12 !h-12"></mat-icon>
+  <h1 class="text-xl font-bold text-t-danger">Error de conexión</h1>
   <p class="text-sm text-t-text-muted mt-2 text-center max-w-sm">
     No se pudo cargar la información necesaria.
   </p>
 
   <div class="flex flex-col sm:flex-row items-center gap-3 mt-6">
-    <button
-      (click)="retry()"
-      class="flex items-center space-x-2 px-6 py-2.5 text-sm font-medium text-white bg-t-primary hover:bg-t-primary-hover rounded-lg shadow-sm transition-colors"
-    >
-      <ng-icon name="heroArrowPath" size="18px"></ng-icon>
+    <button (click)="retry()" class="inline-flex items-center gap-1.5 px-6 py-2.5 text-sm font-medium text-white bg-t-primary hover:bg-t-primary-hover rounded-lg transition-colors">
+      <mat-icon fontIcon="refresh"></mat-icon>
       <span>Reintentar</span>
     </button>
 
-    <button
-      (click)="goHome()"
-      class="flex items-center space-x-2 px-6 py-2.5 text-sm font-medium text-t-text-secondary bg-t-surface border border-t-border hover:bg-t-surface-alt rounded-lg transition-colors"
-    >
-      <ng-icon name="heroArrowRightOnRectangle" size="18px"></ng-icon>
+    <button (click)="goHome()" class="inline-flex items-center gap-1.5 px-6 py-2.5 text-sm font-medium text-t-text-secondary bg-t-surface border border-t-border hover:bg-t-surface-alt rounded-lg transition-colors">
+      <mat-icon fontIcon="logout"></mat-icon>
       <span>Volver al inicio</span>
     </button>
   </div>

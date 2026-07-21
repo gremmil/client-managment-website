@@ -54,7 +54,6 @@ import { MatCardModule } from '@angular/material/card';
     ReactiveFormsModule,
   ],
   templateUrl: './clients-table.component.html',
-  styleUrls: ['./clients-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl }],
 })
@@ -197,7 +196,9 @@ export class ClientsTableComponent implements AfterViewInit {
   openFilterModal(): void {
     const dialogRef = this.dialog.open(FilterModalComponent, {
       data: this.filterForm.value,
-      panelClass: 'filter-modal',
+      width: '100%',
+      maxWidth: '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result) => {

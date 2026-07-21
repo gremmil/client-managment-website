@@ -1,9 +1,5 @@
 <aside
-  [ngClass]="{
-    'sidebar-open': isMobileMenuOpen,
-    'sidebar-closed': !isMobileMenuOpen,
-  }"
-  class="bg-t-surface border-r border-t-border w-64 flex-shrink-0 flex flex-col justify-between h-full overflow-y-auto sidebar-mobile-overlay"
+  class="bg-t-surface border-r border-t-border w-64 flex flex-col justify-between h-full overflow-y-auto"
 >
   <div class="flex flex-col">
     <nav class="mt-6 px-4 space-y-1">
@@ -14,7 +10,7 @@
         (click)="onCloseMobile()"
         class="flex items-center space-x-3 px-4 py-3 rounded-lg text-t-text-secondary hover:bg-t-surface-alt hover:text-t-text transition-colors"
       >
-        <ng-icon name="heroUsers" size="20px"></ng-icon>
+        <mat-icon fontIcon="people" class="!text-[20px] !w-5 !h-5"></mat-icon>
         <span>Clientes</span>
       </a>
     </nav>
@@ -26,15 +22,14 @@
           class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-t-text-secondary hover:bg-t-surface-alt hover:text-t-text transition-colors"
         >
           <div class="flex items-center space-x-3">
-            <ng-icon name="heroPaintBrush" size="20px"></ng-icon>
+            <mat-icon fontIcon="palette" class="!text-[20px] !w-5 !h-5"></mat-icon>
             <span>Tema</span>
           </div>
-          <ng-icon
-            name="heroChevronDown"
-            size="16px"
+          <mat-icon
+            fontIcon="expand_more"
             [class.rotate-180]="showThemeDropdown"
-            class="transition-transform"
-          ></ng-icon>
+            class="transition-transform !text-[16px] !w-4 !h-4"
+          ></mat-icon>
         </button>
         <div
           *ngIf="showThemeDropdown"
@@ -47,7 +42,7 @@
             [class.bg-t-primary-light]="activeTheme === theme.id"
             [class.text-t-primary-text]="activeTheme === theme.id"
           >
-            <ng-icon name="heroPaintBrush" size="16px"></ng-icon>
+            <mat-icon fontIcon="palette" class="!text-[16px] !w-4 !h-4"></mat-icon>
             <span>{{ theme.label }}</span>
           </button>
         </div>
@@ -60,7 +55,7 @@
       (click)="onLogout()"
       class="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg text-t-danger hover:bg-t-danger-light font-medium transition-colors cursor-pointer"
     >
-      <ng-icon name="heroArrowRightOnRectangle" size="20px"></ng-icon>
+      <mat-icon fontIcon="logout" class="!text-[20px] !w-5 !h-5"></mat-icon>
       <span>Cerrar Sesión</span>
     </button>
   </div>

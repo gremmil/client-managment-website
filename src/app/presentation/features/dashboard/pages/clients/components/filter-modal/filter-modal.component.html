@@ -79,12 +79,11 @@
 </mat-dialog-content>
 
 <!-- FOOTER / ACTIONS -->
-<mat-dialog-actions
-  align="end"
-  class="flex items-center gap-2 pt-2 filter-actions"
->
-  <button mat-button (click)="onCancel()">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="applyFilters()">
-    Aplicar filtros
-  </button>
+<mat-dialog-actions align="end">
+  <div class="flex items-center gap-2 pt-2 filter-actions">
+    <button mat-button (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="applyFilters()">
+      Aplicar filtros
+    </button>
+  </div>
 </mat-dialog-actions>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -12,8 +12,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import { HeroFunnel, HeroXMark } from '@ng-icons/heroicons/outline';
 import { ClientFilters } from 'src/app/core/interfaces/client-filter.interface';
 
 @Component({
@@ -32,7 +30,7 @@ import { ClientFilters } from 'src/app/core/interfaces/client-filter.interface';
     MatIconModule,
   ],
   templateUrl: './filter-modal.component.html',
-  styleUrls: ['./filter-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * @description Componente modal para gestionar los filtros avanzados de la tabla de clientes.

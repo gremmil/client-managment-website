@@ -4,42 +4,44 @@
   >
     <div class="flex items-center space-x-4">
       <button
-        (click)="toggleMobileMenu()"
-        class="md:hidden p-2 rounded-lg text-t-text-secondary hover:bg-t-surface-alt hover:text-t-text transition-colors"
+        (click)="toggleSidenav()"
+        class="p-2 rounded-lg text-t-text-secondary hover:bg-t-surface-alt hover:text-t-text transition-colors"
       >
-        <ng-icon
-          [name]="isMobileMenuOpen ? 'heroXMark' : 'heroBars3'"
-          size="24px"
-        ></ng-icon>
+        <mat-icon fontIcon="menu"></mat-icon>
       </button>
       <div class="flex items-center space-x-2">
-        <ng-icon name="heroUserGroup" size="28px" class="text-t-primary"></ng-icon>
-        <span class="text-xl font-bold text-t-text tracking-tight">ClientPortal</span>
+        <mat-icon
+          fontIcon="group"
+          class="text-t-primary !text-[28px] !w-7 !h-7"
+        ></mat-icon>
+        <span class="text-xl font-bold text-t-text tracking-tight"
+          >ClientPortal</span
+        >
       </div>
-      <button
-        (click)="toggleSidebar()"
-        class="hidden md:block p-2 rounded-lg text-t-text-secondary hover:bg-t-surface-alt hover:text-t-text transition-colors"
-      >
-        <ng-icon name="heroBars3" size="20px"></ng-icon>
-      </button>
     </div>
     <div class="flex items-center space-x-4">
-      <span class="hidden lg:inline text-sm text-t-text-muted font-medium">Administrador</span>
+      <span class="hidden lg:inline text-sm text-t-text-muted font-medium"
+        >Administrador</span
+      >
     </div>
   </header>
 
-  <div class="flex-1 flex overflow-hidden relative">
-    <app-sidebar
-      *ngIf="!isSidebarHidden"
-      [isMobileMenuOpen]="isMobileMenuOpen"
-      (logout)="logout()"
-      (closeMobileMenu)="isMobileMenuOpen = false"
-    ></app-sidebar>
-
-    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <div class="flex-1 overflow-hidden p-4 md:p-8 min-h-0">
+  <mat-sidenav-container class="flex-1">
+    <mat-sidenav
+      #sidenav
+      [mode]="sidenavMode"
+      class="border-r border-t-border"
+      style="width: 256px"
+    >
+      <app-sidebar
+        (logout)="logout()"
+        (closeMobileMenu)="sidenav.close()"
+      ></app-sidebar>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <main class="flex flex-col min-w-0 h-full overflow-hidden p-4 md:p-8">
         <router-outlet></router-outlet>
-      </div>
-    </main>
-  </div>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

@@ -23,7 +23,7 @@
         (click)="clearAllFilters()"
         class="hidden md:inline-flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium text-t-danger bg-t-danger-light border border-t-danger rounded-lg hover:bg-t-danger hover:text-white transition-colors flex-1"
       >
-        <ng-icon name="heroXMark" size="16px"></ng-icon>
+        <mat-icon fontIcon="close" class="!text-[16px] !w-4 !h-4"></mat-icon>
         <span>Limpiar filtros</span>
       </button>
 
@@ -31,11 +31,10 @@
         (click)="toggleMetrics()"
         class="inline-flex items-center space-x-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-t-text-secondary bg-t-surface border border-t-border rounded-lg hover:bg-t-surface-alt transition-colors flex-1 justify-center"
       >
-        <ng-icon
-          [name]="showMetrics ? 'heroEyeSlash' : 'heroEye'"
-          size="14px"
-          class="sm:size-4"
-        ></ng-icon>
+        <mat-icon
+          [fontIcon]="showMetrics ? 'visibility_off' : 'visibility'"
+          class="!text-[14px] sm:!text-[16px] !w-[14px] sm:!w-4 !h-[14px] sm:!h-4"
+        ></mat-icon>
         <span>{{ showMetrics ? "Ocultar métricas" : "Mostrar métricas" }}</span>
       </button>
 
@@ -43,7 +42,7 @@
         (click)="openCreateModal()"
         class="inline-flex items-center space-x-1.5 bg-t-primary hover:bg-t-primary-hover text-white text-xs sm:text-sm font-medium px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-sm transition-colors flex-1 justify-center"
       >
-        <ng-icon name="heroPlus" size="14px" class="sm:size-4"></ng-icon>
+        <mat-icon fontIcon="add" class="!text-[14px] sm:!text-[16px] !w-[14px] sm:!w-4 !h-[14px] sm:!h-4"></mat-icon>
         <span>Nuevo Cliente</span>
       </button>
     </div>

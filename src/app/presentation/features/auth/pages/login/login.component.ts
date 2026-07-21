@@ -1,12 +1,21 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { SignInUseCase } from 'src/app/domain/use-cases/sign-in.use-case';
 import { AppError } from 'src/app/core/errors';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { ThemeService } from 'src/app/core/services/theme.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,7 +47,6 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly loadingService = inject(LoadingService);
-  readonly themeService = inject(ThemeService);
   private readonly fb = inject(FormBuilder);
 
   /** @description Formulario reactivo de inicio de sesión con validaciones de email y contraseña */
@@ -84,7 +92,7 @@ export class LoginComponent {
 
     try {
       await firstValueFrom(
-        this.signInUseCase.execute(this.email!.value, this.password!.value)
+        this.signInUseCase.execute(this.email!.value, this.password!.value),
       );
       this.router.navigate(['/loading-data']);
     } catch (error: unknown) {

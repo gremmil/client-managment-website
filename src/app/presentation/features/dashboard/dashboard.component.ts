@@ -1,75 +1,71 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import {
-  HeroBars3,
-  HeroXMark,
-  HeroUserGroup,
-} from '@ng-icons/heroicons/outline';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
+import { firstValueFrom } from 'rxjs';
 import { SignOutUseCase } from 'src/app/domain/use-cases/sign-out.use-case';
 import { AppError } from 'src/app/core/errors';
+import { BreakpointService } from 'src/app/core/services/breakpoint.service';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { BreakpointObserver } from '@angular/cdk/layout';
 
 /**
  * @description Componente principal del panel de control (dashboard).
- * Gestiona la barra lateral, el menú móvil y la sesión del usuario.
+ * Gestiona la barra lateral con MatSidenav, el menú móvil y la sesión del usuario.
+ * En desktop el sidebar empuja el contenido (mode side), en mobile/tablet se superpone con backdrop (mode over).
  */
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NgIconsModule, SidebarComponent],
-  providers: [provideIcons({ HeroBars3, HeroXMark, HeroUserGroup })],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    MatIconModule,
+    MatSidenavModule,
+    SidebarComponent,
+  ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   private readonly signOutUseCase = inject(SignOutUseCase);
   private readonly router = inject(Router);
-  private readonly breakpointObserver = inject(BreakpointObserver);
-  private breakpointSub!: Subscription;
+  private readonly breakpointService = inject(BreakpointService);
 
-  /** @description Indica si el menú móvil está abierto */
-  isMobileMenuOpen: boolean = false;
-  /** @description Indica si la barra lateral está oculta */
-  isSidebarHidden: boolean = false;
+  /** @description Referencia al MatSidenav para controlar apertura/cierre */
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+
+  /** @description Modo del sidenav: 'side' en desktop, 'over' en mobile/tablet */
+  sidenavMode: 'over' | 'side' = 'side';
 
   /**
-   * @description Inicializa el componente y observa los cambios de tamaño de pantalla
-   * para ocultar la barra lateral en resoluciones tablet.
+   * @description Inicializa el componente y observa los cambios de tamaño de pantalla.
+   * En desktop (>=1024px) usa mode side con el sidebar abierto.
+   * En mobile/tablet (<1024px) usa mode over con el sidebar cerrado y backdrop.
    */
   ngOnInit(): void {
-    this.breakpointSub = this.breakpointObserver
-      .observe(['(min-width: 768px) and (max-width: 1023px)'])
-      .subscribe((result) => {
-        this.isSidebarHidden = result.matches;
-      });
+    this.breakpointService.isDesktop$.subscribe((isDesktop) => {
+      this.sidenavMode = isDesktop ? 'side' : 'over';
+      if (isDesktop) {
+        this.sidenav?.open();
+      } else {
+        this.sidenav?.close();
+      }
+    });
   }
 
   /**
-   * @description Limpia las suscripciones al destruir el componente.
+   * @description Alterna la visibilidad del sidebar.
    */
-  ngOnDestroy(): void {
-    if (this.breakpointSub) {
-      this.breakpointSub.unsubscribe();
-    }
-  }
-
-  /**
-   * @description Alterna la visibilidad de la barra lateral.
-   */
-  toggleSidebar(): void {
-    this.isSidebarHidden = !this.isSidebarHidden;
-  }
-
-  /**
-   * @description Alterna la visibilidad del menú móvil.
-   */
-  toggleMobileMenu(): void {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  toggleSidenav(): void {
+    this.sidenav?.toggle();
   }
 
   /**
@@ -81,7 +77,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       await firstValueFrom(this.signOutUseCase.execute());
       this.router.navigate(['/auth']);
     } catch (err) {
-      console.error('Error signing out:', err);
       if (err instanceof AppError) {
         err.markAsHandled();
       }

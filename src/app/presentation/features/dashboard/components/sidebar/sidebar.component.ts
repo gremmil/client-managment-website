@@ -1,38 +1,29 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import {
-  HeroUsers,
-  HeroArrowRightOnRectangle,
-  HeroChevronDown,
-  HeroPaintBrush,
-} from '@ng-icons/heroicons/outline';
+import { MatIconModule } from '@angular/material/icon';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { ThemeId } from 'src/app/core/interfaces/theme.interface';
 
 /**
  * @description Componente de barra lateral del dashboard.
  * Muestra la navegación principal, el selector de temas y el botón de cierre de sesión.
+ * Se renderiza dentro de un MatSidenav que controla su visibilidad.
  */
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, NgIconsModule],
-  providers: [
-    provideIcons({
-      HeroUsers,
-      HeroArrowRightOnRectangle,
-      HeroChevronDown,
-      HeroPaintBrush,
-    }),
-  ],
+  imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-  /** @description Indica si el menú móvil está abierto */
-  @Input() isMobileMenuOpen = false;
   /** @description Evento emitido cuando el usuario solicita cerrar sesión */
   @Output() logout = new EventEmitter<void>();
   /** @description Evento emitido cuando se solicita cerrar el menú móvil */

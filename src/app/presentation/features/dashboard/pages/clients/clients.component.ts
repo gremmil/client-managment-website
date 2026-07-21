@@ -8,14 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import {
-  HeroEye,
-  HeroEyeSlash,
-  HeroPlus,
-  HeroArrowPath,
-  HeroXMark,
-} from '@ng-icons/heroicons/outline';
+import { MatIconModule } from '@angular/material/icon';
 import { AppError } from 'src/app/core/errors';
 import { ClientsStateService } from 'src/app/core/services/clients-state.service';
 import { firstValueFrom, Subscription, tap } from 'rxjs';
@@ -34,15 +27,11 @@ import { Client } from 'src/app/domain/models/client.model';
   standalone: true,
   imports: [
     CommonModule,
-    NgIconsModule,
+    MatIconModule,
     MetricsCardsComponent,
     ClientsTableComponent,
   ],
-  providers: [
-    provideIcons({ HeroEye, HeroEyeSlash, HeroPlus, HeroArrowPath, HeroXMark }),
-  ],
   templateUrl: './clients.component.html',
-  styleUrls: ['./clients.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
@@ -107,10 +96,9 @@ export class ClientsComponent implements OnInit, OnDestroy {
   openCreateModal(): void {
     const isMobile = window.innerWidth < 600;
     const dialogRef = this.dialog.open(CreateClientModalComponent, {
-      width: isMobile ? '95vw' : '500px',
-      maxWidth: isMobile ? '95vw' : '500px',
-      disableClose: false,
-      panelClass: 'create-client-modal',
+      width: isMobile ? 'auto' : '500px',
+      maxWidth: isMobile ? '100%' : '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {

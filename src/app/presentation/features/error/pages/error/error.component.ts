@@ -1,12 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NgIconsModule, provideIcons } from '@ng-icons/core';
-import {
-  HeroExclamationTriangle,
-  HeroArrowPath,
-  HeroArrowRightOnRectangle,
-} from '@ng-icons/heroicons/outline';
+import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 import { SignOutUseCase } from 'src/app/domain/use-cases/sign-out.use-case';
 import { AppError } from 'src/app/core/errors';
@@ -18,16 +13,9 @@ import { AppError } from 'src/app/core/errors';
 @Component({
   selector: 'app-error',
   standalone: true,
-  imports: [CommonModule, NgIconsModule],
-  providers: [
-    provideIcons({
-      HeroExclamationTriangle,
-      HeroArrowPath,
-      HeroArrowRightOnRectangle,
-    }),
-  ],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './error.component.html',
-  styleUrls: ['./error.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorComponent {
   private readonly router = inject(Router);

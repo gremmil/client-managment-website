@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -31,7 +31,7 @@ import { ageAndBirthDateValidator } from 'src/app/core/validators/age-birthdate.
     MatProgressSpinnerModule,
   ],
   templateUrl: './create-client-modal.component.html',
-  styleUrls: ['./create-client-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * @description Componente modal para la creación de un nuevo cliente.
