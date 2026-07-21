@@ -54,6 +54,7 @@ import { MatCardModule } from '@angular/material/card';
     ReactiveFormsModule,
   ],
   templateUrl: './clients-table.component.html',
+  styleUrls: ['./clients-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl }],
 })

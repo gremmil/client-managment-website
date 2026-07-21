@@ -163,19 +163,27 @@
 
     <!-- Template Reutilizable solo para el Botón de Filtro (Evita romper mat-sort-header) -->
     <ng-template #filterButtonTpl let-formKey="formKey" let-menuRef="menuRef">
-      <button
-        mat-icon-button
-        [class.text-t-primary]="isFiltered(formKey)"
-        [class.bg-t-primary-light]="isFiltered(formKey)"
-        (click)="$event.stopPropagation()"
-        [matMenuTriggerFor]="menuRef"
-      >
-        <mat-icon
-          aria-hidden="false"
-          fontIcon="filter_list"
-          class="text-sm"
-        ></mat-icon>
-      </button>
+      <div class="relative inline-flex">
+        <button
+          class="p-0 h-6"
+          (click)="$event.stopPropagation()"
+          [matMenuTriggerFor]="menuRef"
+          [style.background-color]="
+            isFiltered(formKey) ? 'var(--color-primary-light)' : null
+          "
+        >
+          <mat-icon
+            aria-hidden="false"
+            fontIcon="filter_list"
+            class="text-sm"
+            [class.text-t-primary]="isFiltered(formKey)"
+          ></mat-icon>
+        </button>
+        <span
+          *ngIf="isFiltered(formKey)"
+          class="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-t-primary"
+        ></span>
+      </div>
     </ng-template>
   </div>
 
