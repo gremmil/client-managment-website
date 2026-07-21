@@ -69,4 +69,4 @@ firebase-export-metadata.json
 # Logs
 *.log
 
-/scripts
+scripts/serviceAccount.json
