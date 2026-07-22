@@ -33,6 +33,7 @@ import { Client } from 'src/app/domain/models/client.model';
   ],
   templateUrl: './clients.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'flex-1 flex flex-col min-h-0' },
 })
 /**
  * @description Componente principal de la vista de clientes.
