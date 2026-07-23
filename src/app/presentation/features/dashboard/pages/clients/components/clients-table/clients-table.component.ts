@@ -19,7 +19,13 @@ import {
 import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { Client } from 'src/app/domain/models/client.model';
 import { TableFilters } from 'src/app/core/interfaces/client-table.interface';
-import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  startWith,
+  Subscription,
+} from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { FilterModalComponent } from '../filter-modal/filter-modal.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -83,6 +89,8 @@ export class ClientsTableComponent implements AfterViewInit {
   /** @description Observable para gestionar los cambio de los clientes */
   clients$ = this._clients$.asObservable();
 
+  private subscription?: Subscription;
+
   /** @description Formulario Reactivo para gestionar los filtros de la tabla */
   filterForm = this.formBuilder.group({
     name: [''],
@@ -119,7 +127,7 @@ export class ClientsTableComponent implements AfterViewInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     // Flujo Reactivo: Combina los datos de entrada con los cambios del formulario
-    combineLatest([
+    this.subscription = combineLatest([
       this.clients$,
       this.filterForm.valueChanges.pipe(startWith(this.filterForm.value)),
     ])

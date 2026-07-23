@@ -4,7 +4,6 @@ import {
   Component,
   inject,
   OnInit,
-  OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -21,6 +20,7 @@ import { MetricsCardsComponent } from './components/metrics-cards/metrics-cards.
 import { ClientsTableComponent } from './components/clients-table/clients-table.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Client } from 'src/app/domain/models/client.model';
+import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
 
 @Component({
   selector: 'app-clients',
@@ -39,7 +39,8 @@ import { Client } from 'src/app/domain/models/client.model';
  * @description Componente principal de la vista de clientes.
  * Gestiona la interacción con la tabla, métricas, filtros y el modal de creación de clientes.
  */
-export class ClientsComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe()
+export class ClientsComponent implements OnInit {
   private readonly stateService = inject(ClientsStateService);
   private readonly toastService = inject(ToastService);
   private readonly loadingService = inject(LoadingService);
@@ -79,15 +80,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
           this._showMetrics = false;
         }
       });
-  }
-
-  /**
-   * @description Libera los recursos y cancela las suscripciones al destruir el componente.
-   */
-  ngOnDestroy(): void {
-    if (this.breakpointSub) {
-      this.breakpointSub.unsubscribe();
-    }
   }
 
   /**

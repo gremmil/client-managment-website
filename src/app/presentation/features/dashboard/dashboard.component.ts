@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -10,11 +9,12 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { SignOutUseCase } from 'src/app/domain/use-cases/sign-out.use-case';
 import { AppError } from 'src/app/core/errors';
 import { BreakpointService } from 'src/app/core/services/breakpoint.service';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
 
 /**
  * @description Componente principal del panel de control (dashboard).
@@ -34,10 +34,13 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+@AutoUnsubscribe()
 export class DashboardComponent implements OnInit {
   private readonly signOutUseCase = inject(SignOutUseCase);
   private readonly router = inject(Router);
   private readonly breakpointService = inject(BreakpointService);
+
+  private desktopSub?: Subscription;
 
   /** @description Referencia al MatSidenav para controlar apertura/cierre */
   @ViewChild('sidenav') sidenav!: MatSidenav;
@@ -51,14 +54,16 @@ export class DashboardComponent implements OnInit {
    * En mobile/tablet (<1024px) usa mode over con el sidebar cerrado y backdrop.
    */
   ngOnInit(): void {
-    this.breakpointService.isDesktop$.subscribe((isDesktop) => {
-      this.sidenavMode = isDesktop ? 'side' : 'over';
-      if (isDesktop) {
-        this.sidenav?.open();
-      } else {
-        this.sidenav?.close();
-      }
-    });
+    this.desktopSub = this.breakpointService.isDesktop$.subscribe(
+      (isDesktop) => {
+        this.sidenavMode = isDesktop ? 'side' : 'over';
+        if (isDesktop) {
+          this.sidenav?.open();
+        } else {
+          this.sidenav?.close();
+        }
+      },
+    );
   }
 
   /**
