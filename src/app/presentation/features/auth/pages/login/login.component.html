@@ -61,9 +61,9 @@
 
       <div
         *ngIf="errorMessage"
-        class="flex items-center gap-3 px-4 py-3 bg-t-danger-light border border-t-danger rounded-xl mb-6 text-t-danger text-sm"
+        class="flex items-center align-middle gap-3 px-4 py-3 bg-t-danger-light border border-t-danger rounded-xl mb-6 text-t-danger text-sm"
       >
-        <mat-icon class="!text-xl !w-5 !h-5 shrink-0">error_outline</mat-icon>
+        <mat-icon class="text-md shrink-0">error_outline</mat-icon>
         <span>{{ errorMessage }}</span>
       </div>
 
@@ -81,7 +81,7 @@
             autocomplete="email"
           />
           <mat-icon matPrefix class="text-t-text-muted">email</mat-icon>
-          <mat-error>{{ getFieldError(loginForm, 'email') }}</mat-error>
+          <mat-error>{{ getFieldError(loginForm, "email") }}</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="w-full">
@@ -93,7 +93,7 @@
             autocomplete="current-password"
           />
           <mat-icon matPrefix class="text-t-text-muted">lock</mat-icon>
-          <mat-error>{{ getFieldError(loginForm, 'password') }}</mat-error>
+          <mat-error>{{ getFieldError(loginForm, "password") }}</mat-error>
         </mat-form-field>
 
         <button
