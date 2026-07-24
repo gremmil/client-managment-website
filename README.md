@@ -88,7 +88,7 @@ Sistema web de gestión de clientes con autenticación, dashboard y operaciones 
 - Diseño responsive (mobile < 768px, tablet 768-1023px, desktop >= 1024px)
 
 ### Manejo de Errores
-- Clases de error personalizadas: `AppError`, `AuthError`, `NetworkError`, `ValidationError`, `FirestoreError`
+- Clases de error personalizadas: `AppError`, `AuthError`, `NetworkError`, `FirestoreError`
 - `GlobalErrorHandler` que captura excepciones no manejadas
 - `mapFirebaseError`: traduce códigos de error de Firebase a mensajes amigables
 - Operador RxJS `handleErrors` para manejo de errores en pipes
@@ -129,7 +129,7 @@ src/
 │   │   ├── adapters/           # Adaptadores (fechas)
 │   │   ├── components/         # Componentes compartidos (loading-overlay)
 │   │   ├── config/             # Configuración (Firebase, fechas)
-│   │   ├── decorators/         # Decoradores (@AutoUnsubscribe)
+│   │   ├── decorators/         # Decoradores
 │   │   ├── errors/             # Sistema de errores
 │   │   ├── guards/             # Route guards (auth, data-ready)
 │   │   ├── helpers/            # Utilidades (date, math)

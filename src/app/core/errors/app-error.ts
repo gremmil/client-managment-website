@@ -61,17 +61,6 @@ export class NetworkError extends AppError {
 }
 
 /**
- * @description Error de validación de un campo de formulario.
- */
-export class ValidationError extends AppError {
-  /** @description Nombre del campo que falló la validación */
-  constructor(public readonly field: string, message: string) {
-    super('validation/invalid-field', message);
-    this.name = 'ValidationError';
-  }
-}
-
-/**
  * @description Error específico de operaciones con Firestore.
  */
 export class FirestoreError extends AppError {

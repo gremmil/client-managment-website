@@ -35,7 +35,7 @@ export class FirebaseAuthRepository extends AuthRepository {
    * @returns Observable que emite el usuario autenticado mapeado a {@link AuthUser}
    */
   signIn(email: string, password: string): Observable<AuthUser> {
-    return from(signInWithEmailAndPassword(this.auth, email, password) as Promise<UserCredential>).pipe(
+    return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
       handleErrors(5000),
       map((credential: UserCredential) => this.mapToAuthUser(credential.user)),
     );
@@ -48,7 +48,7 @@ export class FirebaseAuthRepository extends AuthRepository {
    * @returns Observable que emite el usuario registrado mapeado a {@link AuthUser}
    */
   signUp(email: string, password: string): Observable<AuthUser> {
-    return from(createUserWithEmailAndPassword(this.auth, email, password) as Promise<UserCredential>).pipe(
+    return from(createUserWithEmailAndPassword(this.auth, email, password)).pipe(
       handleErrors(5000),
       map((credential: UserCredential) => this.mapToAuthUser(credential.user)),
     );

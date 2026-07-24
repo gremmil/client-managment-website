@@ -16,6 +16,8 @@ export interface TableFilters {
   birthDateEnd: Date | null;
 }
 
+export { TableFilters as ClientFilters };
+
 /**
  * @description Métricas calculadas sobre el conjunto de clientes.
  */

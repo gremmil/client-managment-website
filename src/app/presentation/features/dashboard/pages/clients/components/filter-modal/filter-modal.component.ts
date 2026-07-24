@@ -12,7 +12,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
-import { ClientFilters } from 'src/app/core/interfaces/client-filter.interface';
+import { ClientFilters } from 'src/app/core/interfaces/client-table.interface';
 
 @Component({
   selector: 'app-filter-modal',
@@ -27,7 +27,6 @@ import { ClientFilters } from 'src/app/core/interfaces/client-filter.interface';
     MatButtonModule,
     MatIconModule,
     MatNativeDateModule,
-    MatIconModule,
   ],
   templateUrl: './filter-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

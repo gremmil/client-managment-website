@@ -10,29 +10,20 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Nombre</mat-label>
       <input matInput formControlName="name" />
-      <mat-error *ngIf="form.get('name')?.hasError('required')">
-        El nombre es obligatorio.
-      </mat-error>
+      <mat-error>{{ getFieldError(form, 'name') }}</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Apellido</mat-label>
       <input matInput formControlName="lastname" />
-      <mat-error *ngIf="form.get('lastname')?.hasError('required')">
-        El apellido es obligatorio.
-      </mat-error>
+      <mat-error>{{ getFieldError(form, 'lastname') }}</mat-error>
     </mat-form-field>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
       <mat-form-field appearance="fill" class="w-full mb-1 sm:mb-0">
         <mat-label>Edad</mat-label>
         <input matInput type="number" formControlName="age" />
-        <mat-error *ngIf="form.get('age')?.hasError('required')">
-          Edad obligatoria (mín. 18).
-        </mat-error>
-        <mat-error *ngIf="form.get('age')?.hasError('min')">
-          Debe ser mayor de 18 años.
-        </mat-error>
+        <mat-error>{{ getFieldError(form, 'age') }}</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-full">
@@ -46,9 +37,7 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
         <mat-hint>Formato: DD/MM/YYYY</mat-hint>
-        <mat-error *ngIf="form.get('birthDate')?.hasError('required')">
-          Fecha obligatoria.
-        </mat-error>
+        <mat-error>{{ getFieldError(form, 'birthDate') }}</mat-error>
       </mat-form-field>
     </div>
 
@@ -56,11 +45,8 @@
       *ngIf="form.errors && (form.touched || form.dirty)"
       class="text-t-danger text-sm bg-t-danger-light p-3 rounded-lg"
     >
-      <p *ngIf="form.errors['underAge']" class="m-0">
-        Debe ser mayor de 18 años.
-      </p>
-      <p *ngIf="form.errors['ageMismatch']" class="m-0">
-        La edad no coincide con la fecha de nacimiento.
+      <p *ngFor="let msg of getFormGroupErrors(form)" class="m-0">
+        {{ msg }}
       </p>
     </div>
   </form>

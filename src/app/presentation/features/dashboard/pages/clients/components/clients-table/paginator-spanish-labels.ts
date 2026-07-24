@@ -6,7 +6,6 @@ export const spanishRangeLabel = (
   if (length === 0 || pageSize === 0) {
     return `0 de ${length}`;
   }
-  length = Math.max(length, 0);
   const startIndex = page * pageSize;
   const endIndex =
     startIndex < length

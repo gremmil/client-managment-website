@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   inject,
   OnInit,
   ViewChild,
@@ -20,7 +21,6 @@ import { MetricsCardsComponent } from './components/metrics-cards/metrics-cards.
 import { ClientsTableComponent } from './components/clients-table/clients-table.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Client } from 'src/app/domain/models/client.model';
-import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
 
 @Component({
   selector: 'app-clients',
@@ -39,8 +39,7 @@ import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decora
  * @description Componente principal de la vista de clientes.
  * Gestiona la interacción con la tabla, métricas, filtros y el modal de creación de clientes.
  */
-@AutoUnsubscribe()
-export class ClientsComponent implements OnInit {
+export class ClientsComponent implements OnInit, OnDestroy {
   private readonly stateService = inject(ClientsStateService);
   private readonly toastService = inject(ToastService);
   private readonly loadingService = inject(LoadingService);
@@ -145,5 +144,9 @@ export class ClientsComponent implements OnInit {
     if (this.tableComponent) {
       this.tableComponent.onClearAllFilters();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.breakpointSub?.unsubscribe();
   }
 }

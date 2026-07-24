@@ -22,7 +22,7 @@ describe('clientMapper', () => {
         name: 'John',
         lastname: 'Doe',
         age: 25,
-        birthDate: '2001-01-01',
+        birthDate: new Date('2001-01-01'),
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-01-02T00:00:00.000Z',
       });
@@ -46,28 +46,38 @@ describe('clientMapper', () => {
 
   describe('clientDomainToDTO', () => {
     it('should map a Client domain model to a ClientDTO', () => {
+      const birthDate = new Date(2001, 0, 1);
       const client: Client = {
+        id: '1',
+        name: 'John',
+        lastname: 'Doe',
+        age: 25,
+        birthDate,
+        createdAt: '2024-01-01T00:00:00.000Z',
+      };
+
+      const result = clientDomainToDTO(client);
+
+      expect(result).toEqual({
         id: '1',
         name: 'John',
         lastname: 'Doe',
         age: 25,
         birthDate: '2001-01-01',
         createdAt: '2024-01-01T00:00:00.000Z',
-      };
-
-      const result = clientDomainToDTO(client);
-
-      expect(result).toEqual(client);
+        updatedAt: undefined,
+      });
     });
   });
 
   describe('createPayloadToDTO', () => {
     it('should map a CreateClientPayload to a DTO without id/timestamps and trim strings', () => {
+      const birthDate = new Date(2001, 0, 1);
       const payload: CreateClientPayload = {
         name: '  John  ',
         lastname: '  Doe  ',
         age: 25,
-        birthDate: '2001-01-01',
+        birthDate,
       };
 
       const result = createPayloadToDTO(payload);

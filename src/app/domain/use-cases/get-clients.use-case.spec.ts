@@ -22,17 +22,14 @@ describe('GetClientsUseCase', () => {
     useCase = TestBed.inject(GetClientsUseCase);
   });
 
-    useCase = TestBed.inject(GetClientsUseCase);
-  });
-
   it('should be created', () => {
     expect(useCase).toBeTruthy();
   });
 
   it('should call repository.getAll and return clients', (done) => {
     const mockClients: Client[] = [
-      { id: '1', name: 'John', lastname: 'Doe', age: 25, birthDate: '2001-01-01' },
-      { id: '2', name: 'Jane', lastname: 'Smith', age: 30, birthDate: '1996-05-15' },
+      { id: '1', name: 'John', lastname: 'Doe', age: 25, birthDate: new Date('2001-01-01') },
+      { id: '2', name: 'Jane', lastname: 'Smith', age: 30, birthDate: new Date('1996-05-15') },
     ];
     mockRepository.getAll.and.returnValue(of(mockClients));
 

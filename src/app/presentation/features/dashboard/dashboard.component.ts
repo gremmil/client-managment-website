@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   inject,
   OnInit,
   ViewChild,
@@ -14,7 +15,6 @@ import { SignOutUseCase } from 'src/app/domain/use-cases/sign-out.use-case';
 import { AppError } from 'src/app/core/errors';
 import { BreakpointService } from 'src/app/core/services/breakpoint.service';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
 
 /**
  * @description Componente principal del panel de control (dashboard).
@@ -34,8 +34,7 @@ import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decora
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-@AutoUnsubscribe()
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private readonly signOutUseCase = inject(SignOutUseCase);
   private readonly router = inject(Router);
   private readonly breakpointService = inject(BreakpointService);
@@ -86,5 +85,9 @@ export class DashboardComponent implements OnInit {
         err.markAsHandled();
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.desktopSub?.unsubscribe();
   }
 }

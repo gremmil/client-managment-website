@@ -3,6 +3,9 @@ import { ClientsComponent } from './clients.component';
 import { ClientsStateService } from 'src/app/core/services/clients-state.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { of } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatNativeDateModule } from '@angular/material/core';
 
 describe('ClientsComponent', () => {
   let component: ClientsComponent;
@@ -10,7 +13,7 @@ describe('ClientsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClientsComponent],
+      imports: [ClientsComponent, NoopAnimationsModule, MatDialogModule, MatNativeDateModule],
       providers: [
         {
           provide: ClientsStateService,

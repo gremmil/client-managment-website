@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ClientsStateService } from 'src/app/core/services/clients-state.service';
 import { AppError } from 'src/app/core/errors';
-import { LoadingService } from 'src/app/core/services/loading.service';
 
 /**
  * @description Componente que muestra una pantalla de carga mientras se precarga
@@ -21,7 +20,6 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 export class LoadingDataComponent {
   private readonly stateService = inject(ClientsStateService);
   private readonly router = inject(Router);
-  private readonly loadingService = inject(LoadingService);
 
   /** @description Mensaje informativo que se muestra al usuario durante el proceso de carga */
   loadingMessage = 'Conectando a la base de datos...';

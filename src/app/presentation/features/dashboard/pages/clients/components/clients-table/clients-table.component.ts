@@ -5,6 +5,7 @@ import {
   Output,
   ViewChild,
   AfterViewInit,
+  OnDestroy,
   inject,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -33,7 +34,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
-import { AutoUnsubscribe } from 'src/app/core/decorators/auto-unsubscribe.decorator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MyCustomPaginatorIntl } from './my-custom-paginator-intl.service';
@@ -68,8 +68,7 @@ import { MatCardModule } from '@angular/material/card';
  * Recibe la lista completa de clientes, aplica filtros internamente de forma reactiva
  * y emite los datos filtrados hacia el componente padre.
  */
-@AutoUnsubscribe()
-export class ClientsTableComponent implements AfterViewInit {
+export class ClientsTableComponent implements AfterViewInit, OnDestroy {
   /** @description Lista completa de clientes sin filtrar */
   @Input() set clients(data: Client[]) {
     this._clients$.next(data);
@@ -239,5 +238,9 @@ export class ClientsTableComponent implements AfterViewInit {
       startIndex,
       startIndex + this.paginator.pageSize,
     );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 }

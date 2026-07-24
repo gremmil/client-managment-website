@@ -7,6 +7,10 @@ import { AppError, AuthError, FirestoreError, NetworkError } from './app-error';
  * @returns Instancia de AppError (AuthError, FirestoreError, NetworkError o AppError genérico)
  */
 export function mapFirebaseError(error: unknown): AppError {
+  if (!error) {
+    return new AppError('unknown', 'Ocurrió un error inesperado.', error);
+  }
+
   const fbError = error as { code?: unknown; message?: string };
 
   if (typeof fbError.code === 'string' && fbError.code.startsWith('auth/')) {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -15,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { ageAndBirthDateValidator } from 'src/app/core/validators/age-birthdate.validator';
+import { getFieldError, getFormGroupErrors } from 'src/app/core/helpers/get-field-error';
 
 @Component({
   selector: 'app-create-client-modal',
@@ -37,7 +38,7 @@ import { ageAndBirthDateValidator } from 'src/app/core/validators/age-birthdate.
  * @description Componente modal para la creación de un nuevo cliente.
  * Contiene un formulario reactivo con validaciones de edad y fecha de nacimiento.
  */
-export class CreateClientModalComponent {
+export class CreateClientModalComponent implements OnInit {
   /** @description Formulario reactivo para los datos del nuevo cliente */
   form: FormGroup;
   /** @description Fecha máxima permitida para el campo de fecha de nacimiento (hace 18 años) */
@@ -77,6 +78,9 @@ export class CreateClientModalComponent {
   /**
    * @description Envía los datos del formulario si es válido y cierra el modal con los valores ingresados.
    */
+  getFieldError = getFieldError;
+  getFormGroupErrors = getFormGroupErrors;
+
   onSubmit() {
     if (this.form.invalid) return;
     this.dialogRef.close(this.form.value);

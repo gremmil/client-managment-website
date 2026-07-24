@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { getFieldError } from 'src/app/core/helpers/get-field-error';
 
 /**
  * @description Componente encargado de gestionar el inicio de sesión del usuario.
@@ -60,6 +61,8 @@ export class LoginComponent {
   errorMessage: string | null = null;
   /** @description Año actual utilizado en el pie de página del formulario */
   currentYear: number = new Date().getFullYear();
+
+  getFieldError = getFieldError;
 
   /**
    * @description Obtiene el control de formulario correspondiente al campo email.
